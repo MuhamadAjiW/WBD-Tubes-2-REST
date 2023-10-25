@@ -1,12 +1,15 @@
-import { Express, Request, Response } from "express";
-import express from 'express';
+import express, { Express, Request, Response } from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app: Express = express();
+const port = process.env.PORT;
 
-app.get('/', (req: Request, res: Response) =>{
-    res.send("Express is running at 4321");
-})
+app.get('/', (req: Request, res: Response) => {
+    res.send(`Server setup at ${port}`);
+});
 
-app.listen(4321, () => {
-    console.log("Express is running at 4321")
-})
+app.listen(port, () => {
+    console.log(`Server setup at ${port}`);
+});
