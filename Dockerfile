@@ -6,7 +6,11 @@ RUN yarn
 
 COPY tsconfig.json ./
 COPY src ./src
+COPY prisma ./prisma
+
+RUN yarn global add prisma && \
+    prisma generate
 
 CMD [ "npm", "run", "dev" ]
 
-EXPOSE 8010
+EXPOSE 8011
