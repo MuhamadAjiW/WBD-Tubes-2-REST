@@ -1,0 +1,31 @@
+version: "3.3"
+services:
+  rest-api:
+    hostname: service_wbd_2_rest
+    image: tubes-wbd-2:latest
+    env_file: .env
+    ports:
+      - 8011:8011
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rest-postgres
+  rest-postgres:
+    hostname: db_wbd_2_rest
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Aa123456
+      POSTGRES_DB: wbd_db_rest
+      POSTGRES_PORT: 5432
+    ports:
+      - 8012:5432
+    volumes:
+      - ./postgres:/var/lib/postgres
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
