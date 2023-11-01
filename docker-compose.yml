@@ -1,6 +1,6 @@
 version: "3.3"
 services:
-  rest-api:
+  api:
     hostname: service_wbd_2_rest
     image: tubes-wbd-2:latest
     env_file: .env
@@ -13,8 +13,9 @@ services:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - rest-db
-  rest-db:
+      - db
+      - redis
+  db:
     hostname: db_wbd_2_rest
     image: postgres:latest
     environment:
@@ -25,3 +26,12 @@ services:
       - 8012:5432
     volumes:
       - ./postgres:/var/lib/postgres
+  redis:
+    hostname: redis_wbd_2_rest
+    image: redis:latest
+    restart: always
+    ports:
+      - 8013:6379
+    volumes:
+      - ./redis:/data
+

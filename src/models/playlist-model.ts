@@ -8,7 +8,3 @@ interface PlaylistEntryRequest {
     playlist_id: number;
     bookp_id: number;
 }
-
-export class BookPremiumModel{
-
-}

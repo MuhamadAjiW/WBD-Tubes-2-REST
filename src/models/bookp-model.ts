@@ -10,7 +10,3 @@ interface BookPRequest {
     image_path: string;
     audio_path: string;
 }
-
-export class BookPremiumModel{
-
-}

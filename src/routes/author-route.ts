@@ -11,6 +11,7 @@ export class AuthorRoute{
     getRoutes() {
         return Router()
             .get('/authors', this.authorController.index())
+            .get('/authors/:identifier', this.authorController.getAuthor())
             .post("/authors/register", this.authorController.register())
             .post("/authors/login", this.authorController.login())
     }
