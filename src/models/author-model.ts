@@ -1,9 +1,17 @@
-import express, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { prismaClient } from '../config/prisma-config';
-import { hash } from 'bcrypt';
+import { hash, compare } from 'bcrypt';
+import { AuthToken } from '../middlewares/auth-middleware';
+import jwt from 'jsonwebtoken';
+import { jwtExpireTime, jwtSecretKey } from '../config/jwt-config';
 
-interface AuthorRequest {
+interface LoginRequest {
+    email: string;
+    password: string;
+}
+
+interface RegisterRequest {
     email: string;
     username: string;
     password: string;
@@ -15,7 +23,7 @@ export class AuthorModel {
     async register(req: Request, res: Response) {
         // _TODO: Uncomment kalo udah bug free
         // try {
-            const {email, username, password, name, bio}: AuthorRequest = req.body;
+            const {email, username, password, name, bio}: RegisterRequest = req.body;
             if (!email || !username || !password || !name || !bio){
                 res.status(StatusCodes.BAD_REQUEST).json({
                     error: ReasonPhrases.BAD_REQUEST,
@@ -79,7 +87,42 @@ export class AuthorModel {
     }
 
     async login(req: Request, res: Response) {
+        const { email, password }: LoginRequest = req.body;
+        if (!email || !password){
+            res.status(StatusCodes.BAD_REQUEST).json({
+                error: ReasonPhrases.BAD_REQUEST,
+            });
+            return;
+        }
 
+        const author = await prismaClient.author.findFirst({
+            where: { email: email },
+        })
+
+        if(!author){
+            res.status(StatusCodes.UNAUTHORIZED).json({
+                error: "Invalid credentials",
+            });
+            return;
+        }
+
+        const passOk = await compare(password, author.password);
+        if(!passOk){
+            res.status(StatusCodes.UNAUTHORIZED).json({
+                error: "Invalid credentials",
+            });
+            return;
+        }
+
+        const author_id = author.author_id;
+        const tokenInfo: AuthToken = { author_id };
+        const token = jwt.sign(tokenInfo, jwtSecretKey, {
+            expiresIn: jwtExpireTime
+        })
+
+        res.status(StatusCodes.OK).json({
+            data: token
+        })
     }
 
     async getAuthorByID(req: Request, res: Response){

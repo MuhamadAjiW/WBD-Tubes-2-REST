@@ -3,14 +3,14 @@ import express from 'express';
 import { serverPort } from './config/server-config';
 import { AuthorRoute } from './routes/author-route';
 import { prismaClient } from './config/prisma-config';
-import { redisMiddleware } from './middlewares/redis-middleware';
+import { redis } from './config/redis-config';
 
 export class App{
     server: Express;
 
     constructor() {
         const authorRoute = new AuthorRoute();
-        prismaClient.$use(redisMiddleware)
+        prismaClient.$use(redis)
 
         this.server = express();
         this.server.use(

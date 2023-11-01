@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { AuthorModel } from "../models/author-model";
+import { AuthRequest } from "../middlewares/auth-middleware";
+import { ReasonPhrases, StatusCodes } from "http-status-codes";
 
 export class AuthorController{
     authorModel: AuthorModel;
@@ -38,6 +40,22 @@ export class AuthorController{
             }
             console.log("Done");
             return retval;
+        }
+    }
+
+    checkToken () {
+        return async (req: Request, res: Response) => {
+            const { authToken } = req as AuthRequest;
+            if (!authToken){
+                res.status(StatusCodes.UNAUTHORIZED).json({
+                    error: ReasonPhrases.UNAUTHORIZED,
+                });
+                return;
+            }
+
+            res.status(StatusCodes.OK).json({
+                data: authToken
+            })
         }
     }
 }
