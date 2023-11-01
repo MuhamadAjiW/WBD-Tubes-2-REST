@@ -10,8 +10,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String
+model Author {
+  author_id   Int           @id @default(autoincrement())
+  email       String        @unique
+  username    String        @unique
+  password    String
+  name        String
+  bio         String
+  BookPremium BookPremium[]
+  Playlist    Playlist[]
+}
+
+model BookPremium {
+  bookp_id     Int            @id @default(autoincrement())
+  title        String         @unique
+  synopsis     String         @unique
+  author       Author         @relation(fields: [author_id], references: [author_id])
+  author_id    Int
+  genre        String
+  release_date DateTime
+  word_count   Int
+  duration     Int
+  graphic_cntn Boolean
+  image_path   String
+  audio_path   String
+  PlaylistBook PlaylistBook[]
+}
+
+model Playlist {
+  playlist_id  Int            @id @default(autoincrement())
+  title        String
+  description  String
+  author       Author         @relation(fields: [author_id], references: [author_id])
+  author_id    Int
+  PlaylistBook PlaylistBook[]
+}
+
+model PlaylistBook {
+  playlist    Playlist    @relation(fields: [playlist_id], references: [playlist_id])
+  playlist_id Int
+  bookp       BookPremium @relation(fields: [bookp_id], references: [bookp_id])
+  bookp_id    Int
+
+  @@id([playlist_id, bookp_id])
 }

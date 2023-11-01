@@ -13,8 +13,8 @@ services:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - rest-postgres
-  rest-postgres:
+      - rest-db
+  rest-db:
     hostname: db_wbd_2_rest
     image: postgres:latest
     environment:
