@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { AuthorController } from "../controllers/author-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
+import { ErrorMiddleware } from "../middlewares/error-middleware";
 
 export class AuthorRoute{
     authorController: AuthorController;
@@ -13,16 +14,28 @@ export class AuthorRoute{
 
     getRoutes() {
         return Router()
-            .get('/authors', 
-                this.authorController.index())
-            .get('/authors/token/check', 
+            // _TODO: Remove these
+            .get("/token",
+                this.authorController.getAuthorToken())
+            .get('/token/check', 
                 this.authMiddleware.authenticate(),
                 this.authorController.checkToken())
+
+            .get('/authors/gateway', 
+                this.authorController.index())
+            .get('/authors/errorgateway', 
+                this.authorController.testErrorMw())
+
+            .get('/authors', 
+                this.authorController.getAuthors())
+            .post("/authors", 
+                this.authorController.createAuthor())
             .get('/authors/:identifier', 
-                this.authorController.getAuthor())
-            .post("/authors/register", 
-                this.authorController.register())
-            .post("/authors/login", 
-                this.authorController.login())
+                this.authorController.getOneAuthor())
+            .patch('/authors/:identifier', 
+                this.authorController.updateOneAuthor())
+            .delete('/authors/:identifier', 
+                this.authorController.deleteOneAuthor())
+                
     }
 }

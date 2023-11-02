@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "prisma migrate dev && nodemon -q dist/index.js",
-    "run": "nodemon -q dist/index.js"
+    "deploy": "nodemon -q dist/index.js",
+    "reload": "tsc && nodemon -q dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +25,8 @@
     "ioredis": "^5.3.2",
     "prisma": "^5.5.2",
     "prisma-redis-middleware": "^4.8.0",
-    "redis": "^4.6.10"
+    "redis": "^4.6.10",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.1",
