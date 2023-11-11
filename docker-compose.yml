@@ -15,6 +15,8 @@ services:
     depends_on:
       - db
       - redis
+    networks:
+      - wbdNet
   db:
     hostname: db_wbd_2_rest
     image: postgres:latest
@@ -26,6 +28,8 @@ services:
       - 8012:5432
     volumes:
       - ./postgres:/var/lib/postgres
+    networks:
+      - wbdNet
   redis:
     hostname: redis_wbd_2_rest
     image: redis:latest
@@ -34,4 +38,9 @@ services:
       - 8013:6379
     volumes:
       - ./redis:/data
-
+    networks:
+      - wbdNet
+networks:
+  wbdNet:
+    external:
+      true

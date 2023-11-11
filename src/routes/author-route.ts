@@ -14,13 +14,13 @@ export class AuthorRoute{
 
     getRoutes() {
         return Router()
-            // _TODO: Remove these
             .get("/token",
                 this.authorController.getAuthorToken())
             .get('/token/check', 
                 this.authMiddleware.authenticate(),
                 this.authorController.checkToken())
-
+        
+            // _TODO: Remove these
             .get('/authors/gateway', 
                 this.authorController.index())
             .get('/authors/errorgateway', 
