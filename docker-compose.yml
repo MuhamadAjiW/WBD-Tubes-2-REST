@@ -16,7 +16,7 @@ services:
       - db
       - redis
     networks:
-      - wbdNet
+      - dockerNet
   db:
     hostname: db_wbd_2_rest
     image: postgres:latest
@@ -29,7 +29,7 @@ services:
     volumes:
       - ./postgres:/var/lib/postgres
     networks:
-      - wbdNet
+      - dockerNet
   redis:
     hostname: redis_wbd_2_rest
     image: redis:latest
@@ -39,8 +39,8 @@ services:
     volumes:
       - ./redis:/data
     networks:
-      - wbdNet
+      - dockerNet
 networks:
-  wbdNet:
+  dockerNet:
     external:
       true

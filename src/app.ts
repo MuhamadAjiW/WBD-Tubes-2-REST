@@ -11,7 +11,7 @@ export class App{
     constructor() {
         const authorRoute = new AuthorRoute();
 
-        prismaClient.$use(redis)
+        // prismaClient.$use(redis)
         
         this.server = express();
         this.server.use(

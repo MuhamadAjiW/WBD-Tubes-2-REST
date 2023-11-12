@@ -2,13 +2,16 @@ import { Request, Response, Router } from "express";
 import { AuthorController } from "../controllers/author-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { ErrorMiddleware } from "../middlewares/error-middleware";
+import { SOAPController } from "../controllers/soap-controller";
 
 export class AuthorRoute{
     authorController: AuthorController;
+    soapController: SOAPController
     authMiddleware: AuthMiddleware;
 
     constructor() {
         this.authorController = new AuthorController();
+        this.soapController = new SOAPController();
         this.authMiddleware = new AuthMiddleware();
     }
 
@@ -25,6 +28,8 @@ export class AuthorRoute{
                 this.authorController.index())
             .get('/authors/errorgateway', 
                 this.authorController.testErrorMw())
+            .get("/soap/test",
+                this.soapController.test())
 
             .get('/authors', 
                 this.authorController.getAuthors())
@@ -36,6 +41,8 @@ export class AuthorRoute{
                 this.authorController.updateOneAuthor())
             .delete('/authors/:identifier', 
                 this.authorController.deleteOneAuthor())
+            
+
                 
     }
 }
