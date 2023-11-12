@@ -32,6 +32,7 @@ CREATE TABLE "Playlist" (
     "playlist_id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
+    "image_path" TEXT NOT NULL,
     "author_id" INTEGER NOT NULL,
 
     CONSTRAINT "Playlist_pkey" PRIMARY KEY ("playlist_id")
