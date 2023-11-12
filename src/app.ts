@@ -1,5 +1,6 @@
 import { Express, Request, Response } from 'express';
 import express from 'express';
+import cors from 'cors';
 import { serverPort } from './config/server-config';
 import { AuthorRoute } from './routes/author-route';
 import { prismaClient } from './config/prisma-config';
@@ -13,9 +14,10 @@ export class App{
         const authorRoute = new AuthorRoute();
         const bookPRoute = new BookPRoute();
 
-        // prismaClient.$use(redis)
+        prismaClient.$use(redis)
         
         this.server = express();
+        this.server.use((cors as (options: cors.CorsOptions) => express.RequestHandler)({}));
         this.server.use(
             "/api",
             express.json(),
