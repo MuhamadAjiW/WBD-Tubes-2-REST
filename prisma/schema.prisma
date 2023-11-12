@@ -41,6 +41,7 @@ model Playlist {
   playlist_id  Int            @id @default(autoincrement())
   title        String
   description  String
+  image_path   String         
   author       Author         @relation(fields: [author_id], references: [author_id])
   author_id    Int
   PlaylistBook PlaylistBook[]

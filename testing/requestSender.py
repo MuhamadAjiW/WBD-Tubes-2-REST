@@ -66,7 +66,7 @@ def editAuthor(author_id: int):
 def deleteAuthor(author_id: int):
     url = "http://localhost:8011/api/authors/" + str(author_id)
 
-    response = requests.delete(url)
+    response = requests.dedlete(url)
     return response
 
 def testSOAP():

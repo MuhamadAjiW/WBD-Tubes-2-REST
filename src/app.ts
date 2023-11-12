@@ -28,7 +28,8 @@ export class App{
             this.server.get('/', (req: Request, res: Response) => {
                 res.send(`Server setup at ${serverPort}`);
             });
-        }
+        
+    }
         
     run () {
         process.on("uncaughtException", (error) =>{
