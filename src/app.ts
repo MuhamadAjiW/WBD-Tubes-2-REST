@@ -4,12 +4,14 @@ import { serverPort } from './config/server-config';
 import { AuthorRoute } from './routes/author-route';
 import { prismaClient } from './config/prisma-config';
 import { redis } from './config/redis-config';
+import { BookPRoute } from './routes/bookp-route';
 
 export class App{
     server: Express;
 
     constructor() {
         const authorRoute = new AuthorRoute();
+        const bookPRoute = new BookPRoute();
 
         prismaClient.$use(redis)
         
@@ -18,7 +20,8 @@ export class App{
             "/api",
             express.json(),
             express.urlencoded({ extended: true }),
-            authorRoute.getRoutes()
+            authorRoute.getRoutes(),
+            bookPRoute.getRoutes()
             )
             this.server.get('/', (req: Request, res: Response) => {
                 res.send(`Server setup at ${serverPort}`);
