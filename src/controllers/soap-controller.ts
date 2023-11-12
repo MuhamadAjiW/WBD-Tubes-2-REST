@@ -50,7 +50,7 @@ export class SOAPController{
                         reject(error);
                     } else{
                         console.error("XML parsing success:");
-                        const responseData = result['S:Envelope']['S:Body'][0][`ns2:${data.method}Response`][0]['return'];
+                        const responseData = result['S:Envelope']['S:Body'][0][`ns2:${data.method}Response`][0]['return'][0];
                         console.log("Response Data:", responseData);
                         resolve(responseData);
                     }
@@ -67,14 +67,15 @@ export class SOAPController{
     test () {
         return async (req: Request, res: Response) => {
             const testData: SOAPRequest = {
-                handler: 'TestService',
-                method: 'hello',
+                handler: 'SubscriptionService',
+                method: 'getSubscriptionsByUser',
                 args: new Map([
-                    ['message', 'Some message']
+                    ['user_id', '1'],
+                    ['filter', 'ALL']
                 ])
             }
             console.log(this.getEnvelope(testData));
-            const response = await this.sendRequest("/api/test", testData);
+            const response = await this.sendRequest("/api/subscribe", testData);
             console.log("Response: ", response)
 
 
