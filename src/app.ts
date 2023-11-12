@@ -6,36 +6,34 @@ import { AuthorRoute } from './routes/author-route';
 import { prismaClient } from './config/prisma-config';
 import { redis } from './config/redis-config';
 import { BookPRoute } from './routes/bookp-route';
-import { ErrorMiddleware } from './middlewares/error-middleware';
+import { generalError } from './middlewares/error-middleware';
 import "express-async-errors"
 
 require("express-async-errors")
 
 export class App{
     server: Express;
-    errorMiddleware: ErrorMiddleware;
 
     constructor() {
         const authorRoute = new AuthorRoute();
         const bookPRoute = new BookPRoute();
-        this.errorMiddleware = new ErrorMiddleware();
 
         prismaClient.$use(redis)
         
+        console.log("Applying errormiddleware2");
         this.server = express();
         this.server.use((cors as (options: cors.CorsOptions) => express.RequestHandler)({}));
         this.server.use(
-            "/api",
-            express.json(),
-            express.urlencoded({ extended: true }),
-            authorRoute.getRoutes(),
-            bookPRoute.getRoutes(),
-            this.errorMiddleware.check()
-            )
-            this.server.get('/', (req: Request, res: Response) => {
-                res.send(`Server setup at ${serverPort}`);
-            });
-        
+        "/api",
+        express.json(),
+        express.urlencoded({ extended: true }),
+        authorRoute.getRoutes(),
+        bookPRoute.getRoutes(),
+        generalError
+        );
+        this.server.get('/', (req: Request, res: Response) => {
+            res.send(`Server setup at ${serverPort}`);
+        });
     }
         
     run () {

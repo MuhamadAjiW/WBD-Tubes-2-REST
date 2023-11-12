@@ -1,6 +1,5 @@
 import { Request, Response, Router } from "express";
 import { BookPController } from "../controllers/bookp-controller";
-import { ErrorMiddleware } from "../middlewares/error-middleware";
 
 export class BookPRoute {
     bookPController: BookPController;

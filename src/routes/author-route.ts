@@ -1,7 +1,6 @@
 import { Request, Response, Router } from "express";
 import { AuthorController } from "../controllers/author-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
-import { ErrorMiddleware } from "../middlewares/error-middleware";
 import { SOAPController } from "../controllers/soap-controller";
 
 export class AuthorRoute{
