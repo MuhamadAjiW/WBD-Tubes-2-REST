@@ -17,7 +17,7 @@ export class AuthorRoute{
 
     getRoutes() {
         return Router()
-            .get("/token",
+            .post("/token",
                 this.authorController.getAuthorToken())
             .get('/token/check', 
                 this.authMiddleware.authenticate(),

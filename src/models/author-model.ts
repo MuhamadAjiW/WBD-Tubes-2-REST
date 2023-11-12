@@ -344,10 +344,17 @@ export class AuthorModel {
     async getAuthorToken(req: Request, res: Response) {
         // _TODO: Uncomment kalo udah bug free
         // try {
+            console.log(req.body);
             const { email, password }: TokenRequest = req.body;
             if (!email || !password){
                 res.status(StatusCodes.BAD_REQUEST).json({
-                    error: ReasonPhrases.BAD_REQUEST,
+                    error: "No email provided",
+                });
+                return;
+            }
+            if (!password){
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    error: "No password provided",
                 });
                 return;
             }
