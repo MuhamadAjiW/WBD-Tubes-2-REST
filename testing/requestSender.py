@@ -4,8 +4,8 @@ def register():
     url = "http://localhost:8011/api/authors"
 
     data = {
-        "email": "dummy3@example.com",
-        "username": "dummy_user3",
+        "email": "dummy1@example.com",
+        "username": "dummy_user1",
         "password": "dummy_password",
         "name": "Dummy Name",
         "bio": "This is a dummy bio"
@@ -42,6 +42,12 @@ def getAuthor(identifier):
     response = requests.get(url)
     return response
 
+def getAuthors():
+    url = "http://localhost:8011/api/authors"
+
+    response = requests.get(url)
+    return response
+
 def editAuthor(author_id: int):
     url = "http://localhost:8011/api/authors/" + str(author_id)
 
@@ -63,6 +69,11 @@ def deleteAuthor(author_id: int):
     response = requests.delete(url)
     return response
 
+def testSOAP():
+    url = "http://localhost:8011/api/soap/test"
+
+    response = requests.get(url)
+    return response
 
 if __name__ == "__main__":
     token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOjEsImlhdCI6MTY5ODgzODk4NCwiZXhwIjoxNjk4ODQyNTg0fQ.y8OPGQ6GvfTTnzwlYOuQH7k0UxqnUCBIQE8ic1aayw4"

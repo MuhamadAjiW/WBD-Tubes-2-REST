@@ -13,7 +13,7 @@ export class App{
         const authorRoute = new AuthorRoute();
         const bookPRoute = new BookPRoute();
 
-        prismaClient.$use(redis)
+        // prismaClient.$use(redis)
         
         this.server = express();
         this.server.use(

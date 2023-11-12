@@ -1,11 +1,9 @@
 version: "3.3"
 services:
   api:
-    hostname: service_wbd_2_rest
-    image: tubes-wbd-2:latest
-    env_file: .env
     ports:
       - 8011:8011
+    env_file: .env
     volumes:
       - ./:/app
       - /app/node_modules
@@ -15,23 +13,29 @@ services:
     depends_on:
       - db
       - redis
+    networks:
+      - dockerNet
   db:
-    hostname: db_wbd_2_rest
     image: postgres:latest
+    ports:
+      - 8012:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: Aa123456
       POSTGRES_DB: wbd_db_rest
-    ports:
-      - 8012:5432
     volumes:
       - ./postgres:/var/lib/postgres
+    networks:
+      - dockerNet
   redis:
-    hostname: redis_wbd_2_rest
     image: redis:latest
-    restart: always
     ports:
       - 8013:6379
     volumes:
       - ./redis:/data
-
+    networks:
+      - dockerNet
+networks:
+  dockerNet:
+    external:
+      true
