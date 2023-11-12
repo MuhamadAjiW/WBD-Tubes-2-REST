@@ -5,7 +5,7 @@ import { Parser } from "xml2js";
 import { parse } from "path";
 
 export class SOAPController{
-    private soapRoute: String = "http://localhost:8080";
+    private soapRoute: String = "http://tugas-besar-2-wbd-soap-api-1:8080";
     private soapService: String = "http://services.wbdsoap"
     
     private getEnvelope(data: SOAPRequest): string{
@@ -40,7 +40,7 @@ export class SOAPController{
                 const response = await axios.post(this.soapRoute + endpoint, soapData, {
                     headers: {
                         'Content-Type': "text/xml;charset=UTF-8",
-                        "SOAPAction": `${this.soapService}/${data.handler}/${data.method}`
+                        "SOAPAction": `"${this.soapService}/${data.handler}/${data.method}"`
                     }
                 })
                 const parser = new Parser;
@@ -49,9 +49,8 @@ export class SOAPController{
                         console.error("XML parsing error:", error);
                         reject(error);
                     } else{
-                        console.error("XML parsing success:");
+                        console.log("XML parsing success:");
                         const responseData = result['S:Envelope']['S:Body'][0][`ns2:${data.method}Response`][0]['return'][0];
-                        console.log("Response Data:", responseData);
                         resolve(responseData);
                     }
                 })
@@ -68,10 +67,10 @@ export class SOAPController{
         return async (req: Request, res: Response) => {
             const testData: SOAPRequest = {
                 handler: 'SubscriptionService',
-                method: 'getSubscriptionsByUser',
+                method: 'deleteSubscriptionsOne',
                 args: new Map([
                     ['user_id', '1'],
-                    ['filter', 'ALL']
+                    ['author_id', '1']
                 ])
             }
             console.log(this.getEnvelope(testData));
