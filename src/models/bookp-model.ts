@@ -8,6 +8,26 @@ import { TokenRequest } from '../types/TokenRequest';
 import { z } from 'zod';
 import { BookPRequest } from '../types/BookPRequest';
 import { AuthToken } from '../types/AuthToken';
+import { promises as fsPromises } from 'fs';
+import path, { dirname } from 'path';
+
+async function readBinaryFile(filePath: string): Promise<Buffer | null> {
+    try {
+        const fileContents = await fsPromises.readFile(filePath)
+        return fileContents;
+    } catch (error) {
+        console.error(`Error reading file ${filePath}`, error)
+        return null;
+    }
+}
+
+async function getBase64FromFile(filePath: string): Promise<string | null> {
+    const fileContents = await readBinaryFile(filePath);
+    if (fileContents) {
+      return fileContents.toString('base64');
+    }
+    return null;
+  }
 
 export class BookPModel {
     async getBooksP(req: Request, res:Response) {
@@ -173,8 +193,17 @@ export class BookPModel {
             return;
         }
 
+        // Read image and audio files
+        const imageData = bookp.image_path ? await getBase64FromFile(bookp.image_path) : null;
+        const audioData = bookp.audio_path ? await getBase64FromFile(bookp.audio_path) : null;
+
+
         res.status(StatusCodes.OK).json({
-            data: bookp
+            data: {
+                bookp,
+                imageBase64: imageData,
+                audioBase64: audioData,
+            }
         });
         console.log("Book Premium fetched");
         return;

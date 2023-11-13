@@ -28,7 +28,7 @@ model BookPremium {
   author       Author         @relation(fields: [author_id], references: [author_id])
   author_id    Int
   genre        String
-  release_date DateTime
+  release_date DateTime       @db.Date
   word_count   Int
   duration     Int
   graphic_cntn Boolean

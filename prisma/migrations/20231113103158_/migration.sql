@@ -17,7 +17,7 @@ CREATE TABLE "BookPremium" (
     "synopsis" TEXT NOT NULL,
     "author_id" INTEGER NOT NULL,
     "genre" TEXT NOT NULL,
-    "release_date" TIMESTAMP(3) NOT NULL,
+    "release_date" DATE NOT NULL,
     "word_count" INTEGER NOT NULL,
     "duration" INTEGER NOT NULL,
     "graphic_cntn" BOOLEAN NOT NULL,
