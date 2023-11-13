@@ -21,13 +21,15 @@ services:
     networks:
       - dockerNet
   api:
-    image: tubes-2-rest:latest
     ports:
       - 8011:8011
-    env_file: .env
+    env_file: .env_docker
     volumes:
       - ./:/app
       - /app/node_modules
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       - db
       - redis

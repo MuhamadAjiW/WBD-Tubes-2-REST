@@ -68,7 +68,7 @@ def deleteBook(bookp_id: int):
     return response
 
 if __name__ == "__main__":
-    response = editBook(1)
+    response = addBook()
     
     print("\nstatus code:", response.status_code)
     print("Response content:")
