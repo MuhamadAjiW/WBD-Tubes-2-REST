@@ -24,7 +24,7 @@ export class BookPController {
 
     getBooks() {
         return async (req: Request, res: Response) => {
-            return await this.bookpModel.getBooksP(req, res);
+            return await this.bookpModel.getBookPByAuthorID(req, res);
         }
     }
 
