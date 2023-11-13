@@ -22,6 +22,9 @@ export class AuthorRoute{
             .get('/token/check', 
                 this.authMiddleware.authenticate(AuthTypes.USERONLY),
                 this.authorController.checkToken())
+            .get('/token/id', 
+                this.authMiddleware.authenticate(AuthTypes.USERONLY),
+                this.authorController.getTokenID())
         
             // _TODO: Remove these
             .get('/authors/gateway', 

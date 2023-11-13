@@ -277,10 +277,7 @@ export class AuthorModel {
         const token = req.header('Authorization')?.replace('Bearer ', '');
 
         if (!token) {
-            res.status(StatusCodes.UNAUTHORIZED).json({
-              error: 'No token provided',
-            });
-            return;
+            throw new UnauthorizedError("No token provided");
         }
 
         const decoded = jwt.verify(token, jwtSecretKey) as {author: {author_id: number}}

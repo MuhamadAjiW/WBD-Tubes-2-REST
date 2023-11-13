@@ -28,7 +28,7 @@ def login():
     return response
 
 def check(token):
-    url = "http://localhost:8011/api/token/check"
+    url = "http://localhost:8011/api/token/id"
 
     headers = {'Authorization': 'Bearer ' + str(token)}
 
@@ -76,8 +76,8 @@ def testSOAP():
     return response
 
 if __name__ == "__main__":
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOjEsImlhdCI6MTY5ODgzODk4NCwiZXhwIjoxNjk4ODQyNTg0fQ.y8OPGQ6GvfTTnzwlYOuQH7k0UxqnUCBIQE8ic1aayw4"
-    response = getAuthor(1)
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOjEsImlhdCI6MTY5OTg2OTUxMiwiZXhwIjoxNjk5ODczMTEyfQ.uZ0RZsG96BoqXdEYn_CgGSaqslkPTsJo8mAJ-5L-pw4"
+    response = check(token)
     
     print("\nstatus code:", response.status_code)
     print("Response content:")

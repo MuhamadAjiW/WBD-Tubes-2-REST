@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AuthorModel } from "../models/author-model";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { AuthRequest } from "../types/AuthRequest";
+import { UnauthorizedError } from "../types/errors/UnauthorizedError";
 
 export class AuthorController{
     authorModel: AuthorModel;
@@ -67,21 +68,25 @@ export class AuthorController{
         return async (req: Request, res: Response) => {
             const { authToken } = req as AuthRequest;
             if (!authToken){
-                res.status(StatusCodes.UNAUTHORIZED).json({
-                    error: ReasonPhrases.UNAUTHORIZED,
-                });
-                return;
+                throw new UnauthorizedError("Bad token");
             }
             
             res.status(StatusCodes.OK).json({
-                data: authToken
+                data: "Token is valid"
             })
         }
     }
 
-    getAuthorId () {
+    getTokenID() {
         return async (req: Request, res: Response) => {
-            return await this.authorModel.decodeToken(req, res);
+            const { authToken } = req as AuthRequest;
+            if (!authToken){
+                throw new UnauthorizedError("Bad token");
+            }
+            
+            res.status(StatusCodes.OK).json({
+                data: authToken.author_id
+            })
         }
     }
     
