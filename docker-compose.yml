@@ -1,20 +1,5 @@
 version: "3.3"
 services:
-  api:
-    ports:
-      - 8011:8011
-    env_file: .env
-    volumes:
-      - ./:/app
-      - /app/node_modules
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - db
-      - redis
-    networks:
-      - dockerNet
   db:
     image: postgres:latest
     ports:
@@ -33,6 +18,19 @@ services:
       - 8013:6379
     volumes:
       - ./redis:/data
+    networks:
+      - dockerNet
+  api:
+    image: tubes-2-rest:latest
+    ports:
+      - 8011:8011
+    env_file: .env
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    depends_on:
+      - db
+      - redis
     networks:
       - dockerNet
 networks:

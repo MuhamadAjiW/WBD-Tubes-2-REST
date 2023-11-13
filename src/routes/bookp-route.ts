@@ -10,14 +10,15 @@ export class BookPRoute {
 
     getRoutes() {
         return Router()
-
             .get('/books',
                 this.bookPController.getBooks())
             .post('/books',
                 this.bookPController.createBookP())
-            .get('/books/:identifier', 
-                this.bookPController.getBookPByID())
+            .get('/books/author/:identifier', 
+                this.bookPController.getBookPByAuthor())
             .delete('/books/:identifier',
                 this.bookPController.deleteOneBookP())
+            .patch('/books/:identifier',
+                this.bookPController.updateOneBook())
     }
 }

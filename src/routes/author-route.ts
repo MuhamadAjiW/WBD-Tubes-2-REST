@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { AuthorController } from "../controllers/author-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { SOAPController } from "../controllers/soap-controller";
+import { AuthTypes } from "../types/enums/AuthTypes";
 
 export class AuthorRoute{
     authorController: AuthorController;
@@ -19,8 +20,11 @@ export class AuthorRoute{
             .post("/token",
                 this.authorController.getAuthorToken())
             .get('/token/check', 
-                this.authMiddleware.authenticate(),
+                this.authMiddleware.authenticate(AuthTypes.USERONLY),
                 this.authorController.checkToken())
+            .get('/token/id', 
+                this.authMiddleware.authenticate(AuthTypes.USERONLY),
+                this.authorController.getTokenID())
         
             // _TODO: Remove these
             .get('/authors/gateway', 
@@ -31,18 +35,18 @@ export class AuthorRoute{
                 this.soapController.test())
 
             .get('/authors', 
+                this.authMiddleware.authenticate(AuthTypes.INTERNALONLY),
                 this.authorController.getAuthors())
-            .post("/authors", 
+            .post("/authors",
                 this.authorController.createAuthor())
             .get('/authors/:identifier', 
+                this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
                 this.authorController.getOneAuthor())
-            .patch('/authors/:identifier', 
+            .patch('/authors/:identifier',
+                this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
                 this.authorController.updateOneAuthor())
             .delete('/authors/:identifier', 
-                this.authorController.deleteOneAuthor())
-            
-            .get('/get/authorid',
-                this.authorController.getAuthorId())
-  
+                this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
+                this.authorController.deleteOneAuthor())  
     }
 }

@@ -10,14 +10,18 @@ import { BookPRequest } from '../types/BookPRequest';
 import { AuthToken } from '../types/AuthToken';
 import { promises as fsPromises } from 'fs';
 import path, { dirname } from 'path';
+import { BadRequestError } from '../types/errors/BadRequestError';
+import { NotFoundError } from '../types/errors/NotFoundError';
+import { BookPUpdateRequest } from '../types/BookPUpdateRequest';
+import { ConflictError } from '../types/errors/ConflictError';
 
-async function readBinaryFile(filePath: string): Promise<Buffer | null> {
+async function readBinaryFile(filePath: string): Promise<Buffer | string> {
     try {
         const fileContents = await fsPromises.readFile(filePath)
         return fileContents;
     } catch (error) {
         console.error(`Error reading file ${filePath}`, error)
-        return null;
+        return "Not Exist";
     }
 }
 
@@ -26,7 +30,7 @@ async function getBase64FromFile(filePath: string): Promise<string | null> {
     if (fileContents) {
       return fileContents.toString('base64');
     }
-    return null;
+    return "Not Exist";
   }
 
 export class BookPModel {
@@ -159,14 +163,11 @@ export class BookPModel {
         let notId: boolean = false;
 
         console.log("Checking by author ID");
+        console.log(req.params.identifier)
         const author_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
 
         if (!author_id.success){
-            console.error(req.params.identifier)
-            res.status(StatusCodes.BAD_REQUEST).json({
-                error: author_id.error.message,
-            });
-            return;
+            throw new BadRequestError(author_id.error.message)
         }
 
         const bookp = await prismaClient.bookPremium.findFirst({
@@ -188,14 +189,14 @@ export class BookPModel {
 
         if (!bookp) {
             res.status(StatusCodes.NOT_FOUND).json({
-                error: "User does not exist"
+                error: "Author does not exist"
             });
             return;
         }
 
         // Read image and audio files
-        const imageData = bookp.image_path ? await getBase64FromFile(bookp.image_path) : null;
-        const audioData = bookp.audio_path ? await getBase64FromFile(bookp.audio_path) : null;
+        const imageData = bookp.image_path ? await getBase64FromFile(bookp.image_path) : "notExist";
+        const audioData = bookp.audio_path ? await getBase64FromFile(bookp.audio_path) : "notExist";
 
 
         res.status(StatusCodes.OK).json({
@@ -215,11 +216,7 @@ export class BookPModel {
         console.log("checking ID")
         const id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
         if (!id.success){
-            console.error(req.params.identifier)
-            res.status(StatusCodes.BAD_REQUEST).json({
-                error: id.error.message,
-            });
-            return;
+            throw new BadRequestError(id.error.message)
         }
 
         try {
@@ -240,5 +237,62 @@ export class BookPModel {
         }
     }
 
+    async editBookP(req: Request, res: Response) {
+        const bookp_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
+        if(!bookp_id.success){
+            throw new BadRequestError(bookp_id.error.message);
+        }
+
+        const currentBook = await prismaClient.bookPremium.findFirst({
+            where: { bookp_id: bookp_id.data }
+        });
+
+        if (!currentBook){
+            throw new NotFoundError("Book does not exist");
+        }
+
+        const bookPRequest = BookPUpdateRequest.safeParse(req.body);
+        if (!bookPRequest.success) {
+            throw new BadRequestError(bookPRequest.error.message);
+        }
+
+        const requestData: BookPUpdateRequest = bookPRequest.data
+
+        if (requestData.title && requestData.title != currentBook.title) {
+            const existingBookTitle = await prismaClient.bookPremium.findFirst({
+                where: { title: requestData.title }
+            });
+            if (existingBookTitle) {
+                throw new ConflictError("Title has already been used")
+            }
+        }
+
+        const newBookP = await prismaClient.bookPremium.update({
+            where: { bookp_id: bookp_id.data },
+            data: requestData
+        })
+
+        if (!newBookP) {
+            throw new Error("Failed to update book");
+        }
+
+        res.status(StatusCodes.CREATED).json({
+            data: {
+                bookp_id: newBookP.bookp_id,
+                title: newBookP.title,
+                synopsis: newBookP.synopsis,
+                genre: newBookP.genre,
+                release_date: newBookP.release_date,
+                word_count: newBookP.word_count,
+                duration: newBookP.duration,
+                graphic_cntn: newBookP.graphic_cntn,
+                image_path: newBookP.image_path,
+                audio_path: newBookP.audio_path,
+            }
+        })
+
+        console.log("Book Premium edited")
+        return;
+    }
 
 }

@@ -51,4 +51,10 @@ export class BookPController {
             throw Error();
         }
     }
+
+    updateOneBook() {
+        return async (req: Request, res: Response) => {
+            return await this.bookpModel.editBookP(req, res);
+        }
+    }
 }

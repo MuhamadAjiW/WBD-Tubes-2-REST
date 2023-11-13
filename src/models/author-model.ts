@@ -9,6 +9,10 @@ import { TokenRequest } from '../types/TokenRequest';
 import { z } from 'zod';
 import { AuthorUpdateRequest } from '../types/AuthorUpdateRequest';
 import { AuthToken } from '../types/AuthToken';
+import { BadRequestError } from '../types/errors/BadRequestError';
+import { UnauthorizedError } from '../types/errors/UnauthorizedError';
+import { ConflictError } from '../types/errors/ConflictError';
+import { NotFoundError } from '../types/errors/NotFoundError';
 
 export class AuthorModel {
     async getAuthors(req: Request, res: Response){
@@ -46,366 +50,234 @@ export class AuthorModel {
     }
 
     async createAuthor(req: Request, res: Response) {
-        // _TODO: Uncomment kalo udah bug free
-        // try {
-            let authRequest: AuthorRequest;
-            try {
-                authRequest = req.body;
-            } catch (error) {
-                res.status(StatusCodes.BAD_REQUEST).json({
-                    error: ReasonPhrases.BAD_REQUEST,
-                });
-                return;
-            }
-            
-            const existingUserEmail = await prismaClient.author.findFirst({
-                where: { email: authRequest.email }
-            });
-            if (existingUserEmail){
-                res.status(StatusCodes.CONFLICT).json({
-                    error: "Email is already taken"
-                });
-                return;
-            }
-    
-            const existingUserUname = await prismaClient.author.findFirst({
-                where: { username: authRequest.username }
-            });
-            if (existingUserUname){
-                res.status(StatusCodes.CONFLICT).json({
-                    error: "Username is already taken"
-                });
-                return;
-            }
-    
-            authRequest.password = await hash(authRequest.password, 10);
-            const newAuthor = await prismaClient.author.create({
-                data: authRequest
-            });
-    
-            if (!newAuthor){
-                res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                    error: ReasonPhrases.INTERNAL_SERVER_ERROR
-                });
-                return;
-            }
+        let authRequest: AuthorRequest;
+        try {
+            authRequest = req.body;
+        } catch (error) {
+            throw new BadRequestError("Bad request parameters");
+        }
         
-            res.status(StatusCodes.CREATED).json({
-                data: {
-                    author_id: newAuthor.author_id,
-                    email: newAuthor.email,
-                    username: newAuthor.username,
-                    name: newAuthor.name,
-                    bio: newAuthor.bio,
-                }
-            });
-            console.log("Author created");
-            return;
+        const existingUserEmail = await prismaClient.author.findFirst({
+            where: { email: authRequest.email }
+        });
+        if (existingUserEmail){
+            throw new ConflictError("Email has already been taken");
+        }
 
-        // _TODO: Uncomment kalo udah bug free
-        // } catch (error) {
-        //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        //         error: ReasonPhrases.INTERNAL_SERVER_ERROR
-        //     });
-        //     return;
-        // }
+        const existingUserUname = await prismaClient.author.findFirst({
+            where: { username: authRequest.username }
+        });
+        if (existingUserUname){
+            throw new ConflictError("Username has already been taken");
+        }
+
+        authRequest.password = await hash(authRequest.password, 10);
+        const newAuthor = await prismaClient.author.create({
+            data: authRequest
+        });
+
+        if (!newAuthor){
+            throw new Error("Failed to create author");
+        }
+    
+        res.status(StatusCodes.CREATED).json({
+            data: {
+                author_id: newAuthor.author_id,
+                email: newAuthor.email,
+                username: newAuthor.username,
+                name: newAuthor.name,
+                bio: newAuthor.bio,
+            }
+        });
+        console.log("Author created");
+        return;
     }
 
     async getAuthorByID(req: Request, res: Response){
         let notId: boolean = false;
-        // _TODO: Uncomment kalo udah bug free
-        // try {
-            console.log("checking by ID");
-            const id = req.params.identifier;
-            if (!id){
-                res.status(StatusCodes.BAD_REQUEST).json({
-                    error: ReasonPhrases.BAD_REQUEST,
-                });
-                return;
+        console.log("checking by ID");
+        const id = req.params.identifier;
+        if (!id){
+            throw new BadRequestError("No id provided");
+        }
+
+        const numberId = parseInt(id, 10);
+        if (isNaN(numberId)){
+            notId = true;
+            throw new Error();
+        }
+
+        const user = await prismaClient.author.findFirst({
+            where: { author_id: numberId },
+            select: {
+                author_id: true,
+                email: true,
+                username: true,
+                name: true,
+                bio: true,
             }
+        });
+        if (!user){
+            throw new NotFoundError("User does not exist");
+        }
 
-            const numberId = parseInt(id, 10);
-            if (isNaN(numberId)){
-                notId = true;
-                throw new Error();
-            }
-
-            const user = await prismaClient.author.findFirst({
-                where: { author_id: numberId },
-                select: {
-                    author_id: true,
-                    email: true,
-                    username: true,
-                    name: true,
-                    bio: true,
-                }
-            });
-            if (!user){
-                res.status(StatusCodes.NOT_FOUND).json({
-                    error: "User does not exist"
-                });
-                return;
-            }
-
-            res.status(StatusCodes.OK).json({
-                data: user
-            });
-            console.log("Author fetched");
-            return;
-
-        // _TODO: Uncomment kalo udah bug free
-        // } catch (error) {
-        //     if(notId){
-        //         throw new Error();
-        //     }
-        //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        //         error: ReasonPhrases.INTERNAL_SERVER_ERROR
-        //     });
-        //     return;
-        // }
+        res.status(StatusCodes.OK).json({
+            data: user
+        });
+        console.log("Author fetched");
+        return;
     }
 
     async getAuthorByUsername(req: Request, res: Response){
-        // _TODO: Uncomment kalo udah bug free
-        // try {
-            console.log("checking by Username");
-            const username = z.string().safeParse(req.params.identifier);
-            if (!username.success){
-                res.status(StatusCodes.BAD_REQUEST).json({
-                    error: username.error.message,
-                });
-                return;
+        console.log("checking by Username");
+        const username = z.string().safeParse(req.params.identifier);
+        if (!username.success){
+            throw new BadRequestError(username.error.message);
+        }
+
+        const user = await prismaClient.author.findFirst({
+            where: { username: username.data },
+            select: {
+                author_id: true,
+                email: true,
+                username: true,
+                name: true,
+                bio: true,
             }
+        });
+        if (!user){
+            throw new NotFoundError("User does not exist");
+        }
 
-            const user = await prismaClient.author.findFirst({
-                where: { username: username.data },
-                select: {
-                    author_id: true,
-                    email: true,
-                    username: true,
-                    name: true,
-                    bio: true,
-                }
-            });
-            if (!user){
-                res.status(StatusCodes.NOT_FOUND).json({
-                    error: "User does not exist"
-                });
-                return;
-            }
-
-            res.status(StatusCodes.OK).json({
-                data: user
-            });
-            console.log("Author fetched");
-            return;
-
-        // _TODO: Uncomment kalo udah bug free
-        // } catch (error) {
-        //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        //         error: ReasonPhrases.INTERNAL_SERVER_ERROR
-        //     });
-        //     return;
-        // }
+        res.status(StatusCodes.OK).json({
+            data: user
+        });
+        console.log("Author fetched");
+        return;
     }
 
     async deleteAuthorByID(req: Request, res: Response){
         let notId: boolean = false;
-        // _TODO: Uncomment kalo udah bug free
-        // try {
-            console.log("checking by ID");
-            const id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
-            if (!id.success){
-                console.error(req.params.identifier)
-                res.status(StatusCodes.BAD_REQUEST).json({
-                    error: id.error.message,
-                });
-                return;
-            }
+        console.log("checking by ID");
+        const id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
+        if (!id.success){
+            throw new BadRequestError(id.error.message);
+        }
 
-            try {
-                const user = await prismaClient.author.delete({
-                    where: { author_id: id.data }                
-                });
-    
-                res.status(StatusCodes.OK).json({
-                    data: user
-                });
-                return;
-            } catch (error) {
-                res.status(StatusCodes.NOT_FOUND).json({
-                    error: "User does not exist"
-                });
-                console.log("Author deleted");
-                return;
-            }
+        try {
+            const user = await prismaClient.author.delete({
+                where: { author_id: id.data }                
+            });
 
-        // _TODO: Uncomment kalo udah bug free
-        // } catch (error) {
-        //     if(notId){
-        //         throw new Error();
-        //     }
-        //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        //         error: ReasonPhrases.INTERNAL_SERVER_ERROR
-        //     });
-        //     return;
-        // }
+            res.status(StatusCodes.OK).json({
+                data: user
+            });
+            return;
+        } catch (error) {
+            throw new NotFoundError("User does not exist");
+        }
     }
 
     async editAuthor(req: Request, res: Response) {
-        // _TODO: Uncomment kalo udah bug free
-        // try {
-            const author_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
-            if(!author_id.success){
-                res.status(StatusCodes.NOT_FOUND).json({
-                    error: author_id.error.message,
-                });
-                return;
-            }
+        const author_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
+        if(!author_id.success){
+            throw new BadRequestError(author_id.error.message);
+        }
 
-            const currentUser = await prismaClient.author.findFirst({
-                where: { author_id: author_id.data }
-            });
-            if (!currentUser){
-                res.status(StatusCodes.NOT_FOUND).json({
-                    error: "User does not exist"
-                });
-                return;
-            }
-            
-            const authRequest = AuthorUpdateRequest.safeParse(req.body);
-            if(!authRequest.success){
-                res.status(StatusCodes.BAD_REQUEST).json({
-                    error: authRequest.error.message,
-                });
-                return;
-            }
-            const requestData: AuthorUpdateRequest = authRequest.data;
-
-            if(requestData.email && requestData.email != currentUser.email){
-                const existingUserEmail = await prismaClient.author.findFirst({
-                    where: { email: requestData.email }
-                });
-                if (existingUserEmail){
-                    res.status(StatusCodes.CONFLICT).json({
-                        error: "Email is already taken"
-                    });
-                    return;
-                }
-            }
-            if(requestData.username && requestData.username != currentUser.username){
-                const existingUserUname = await prismaClient.author.findFirst({
-                    where: { username: requestData.username },
-                });
-                if (existingUserUname){
-                    res.status(StatusCodes.CONFLICT).json({
-                        error: "Username is already taken"
-                    });
-                    return;
-                }
-            }
-            if(requestData.password){
-                requestData.password = await hash(requestData.password, 10);
-            } 
-
-            const newAuthor = await prismaClient.author.update({
-                where: { author_id: author_id.data},
-                data: requestData
-            });
-    
-            if (!newAuthor){
-                res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                    error: ReasonPhrases.INTERNAL_SERVER_ERROR
-                });
-                return;
-            }
+        const currentUser = await prismaClient.author.findFirst({
+            where: { author_id: author_id.data }
+        });
+        if (!currentUser){
+            throw new NotFoundError("User does not exist");
+        }
         
-            res.status(StatusCodes.CREATED).json({
-                data: {
-                    author_id: newAuthor.author_id,
-                    email: newAuthor.email,
-                    username: newAuthor.username,
-                    name: newAuthor.name,
-                    bio: newAuthor.bio,
-                }
-            });
-            console.log("Author edited");
-            return;
+        const authRequest = AuthorUpdateRequest.safeParse(req.body);
+        if(!authRequest.success){
+            throw new BadRequestError(authRequest.error.message);
+        }
+        const requestData: AuthorUpdateRequest = authRequest.data;
 
-        // _TODO: Uncomment kalo udah bug free
-        // } catch (error) {
-        //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        //         error: ReasonPhrases.INTERNAL_SERVER_ERROR
-        //     });
-        //     return;
-        // }
+        if(requestData.email && requestData.email != currentUser.email){
+            const existingUserEmail = await prismaClient.author.findFirst({
+                where: { email: requestData.email }
+            });
+            if (existingUserEmail){
+                throw new ConflictError("Email has already been taken");
+            }
+        }
+        if(requestData.username && requestData.username != currentUser.username){
+            const existingUserUname = await prismaClient.author.findFirst({
+                where: { username: requestData.username },
+            });
+            if (existingUserUname){
+                throw new ConflictError("Username has already been taken");
+            }
+        }
+        if(requestData.password){
+            requestData.password = await hash(requestData.password, 10);
+        } 
+
+        const newAuthor = await prismaClient.author.update({
+            where: { author_id: author_id.data},
+            data: requestData
+        });
+
+        if (!newAuthor){
+            throw new Error("Failed to update author");
+        }
+    
+        res.status(StatusCodes.CREATED).json({
+            data: {
+                author_id: newAuthor.author_id,
+                email: newAuthor.email,
+                username: newAuthor.username,
+                name: newAuthor.name,
+                bio: newAuthor.bio,
+            }
+        });
+        console.log("Author edited");
+        return;
     }
 
     async getAuthorToken(req: Request, res: Response) {
-        // _TODO: Uncomment kalo udah bug free
-        // try {
-            console.log(req.body);
-            const { email, password }: TokenRequest = req.body;
-            if (!email || !password){
-                res.status(StatusCodes.BAD_REQUEST).json({
-                    error: "No email provided",
-                });
-                return;
-            }
-            if (!password){
-                res.status(StatusCodes.BAD_REQUEST).json({
-                    error: "No password provided",
-                });
-                return;
-            }
+        console.log(req.body);
+        const { email, password }: TokenRequest = req.body;
+        if (!email || !password){
+            throw new BadRequestError("No email provided");
+        }
+        if (!password){
+            throw new BadRequestError("No password provided");
+        }
 
-            const author = await prismaClient.author.findFirst({
-                where: { email: email },
-            })
+        const author = await prismaClient.author.findFirst({
+            where: { email: email },
+        })
 
-            if(!author){
-                res.status(StatusCodes.UNAUTHORIZED).json({
-                    error: "Invalid credentials",
-                });
-                return;
-            }
+        if(!author){
+            throw new UnauthorizedError("Invalid credentials");
+        }
 
-            const passOk = await compare(password, author.password);
-            if(!passOk){
-                res.status(StatusCodes.UNAUTHORIZED).json({
-                    error: "Invalid credentials",
-                });
-                return;
-            }
+        const passOk = await compare(password, author.password);
+        if(!passOk){
+            throw new UnauthorizedError("Invalid credentials");
+        }
 
-            const author_id = author.author_id;
-            const tokenInfo: AuthToken = { author_id };
-            const token = jwt.sign(tokenInfo, jwtSecretKey, {
-                expiresIn: jwtExpireTime
-            })
+        const author_id = author.author_id;
+        const tokenInfo: AuthToken = { author_id };
+        const token = jwt.sign(tokenInfo, jwtSecretKey, {
+            expiresIn: jwtExpireTime
+        })
 
-            
-
-            res.status(StatusCodes.OK).json({
-                data: token
-            })
-        // _TODO: Uncomment kalo udah bug free
-        // } catch (error) {
-        //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        //         error: ReasonPhrases.INTERNAL_SERVER_ERROR
-        //     });
-        //     return;
-        // }
+        res.status(StatusCodes.OK).json({
+            data: token
+        })
     }
 
     async decodeToken(req: Request, res: Response) {
         const token = req.header('Authorization')?.replace('Bearer ', '');
 
         if (!token) {
-            res.status(StatusCodes.UNAUTHORIZED).json({
-              error: 'No token provided',
-            });
-            return;
+            throw new UnauthorizedError("No token provided");
         }
 
         const decoded = jwt.verify(token, jwtSecretKey) as {author: {author_id: number}}

@@ -28,7 +28,7 @@ def login():
     return response
 
 def check(token):
-    url = "http://localhost:8011/api/token/check"
+    url = "http://localhost:8011/api/token/id"
 
     headers = {'Authorization': 'Bearer ' + str(token)}
 
