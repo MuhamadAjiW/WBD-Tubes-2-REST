@@ -20,10 +20,10 @@ export class AuthorRoute{
             .post("/token",
                 this.authorController.getAuthorToken())
             .get('/token/check', 
-                this.authMiddleware.authenticate(AuthTypes.USERONLY),
+                // this.authMiddleware.authenticate(AuthTypes.USERONLY),
                 this.authorController.checkToken())
             .get('/token/id', 
-                this.authMiddleware.authenticate(AuthTypes.USERONLY),
+                // this.authMiddleware.authenticate(AuthTypes.USERONLY),
                 this.authorController.getTokenID())
         
             // _TODO: Remove these
@@ -35,18 +35,18 @@ export class AuthorRoute{
                 this.soapController.test())
 
             .get('/authors', 
-                this.authMiddleware.authenticate(AuthTypes.INTERNALONLY),
+                // this.authMiddleware.authenticate(AuthTypes.INTERNALONLY),
                 this.authorController.getAuthors())
             .post("/authors",
                 this.authorController.createAuthor())
             .get('/authors/:identifier', 
-                this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
+                // this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
                 this.authorController.getOneAuthor())
             .patch('/authors/:identifier',
-                this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
+                // this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
                 this.authorController.updateOneAuthor())
             .delete('/authors/:identifier', 
-                this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
+                // this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
                 this.authorController.deleteOneAuthor())  
     }
 }

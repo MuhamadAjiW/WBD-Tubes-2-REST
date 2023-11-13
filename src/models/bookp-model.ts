@@ -13,7 +13,10 @@ import path, { dirname } from 'path';
 import { BadRequestError } from '../types/errors/BadRequestError';
 import { NotFoundError } from '../types/errors/NotFoundError';
 import { BookPUpdateRequest } from '../types/BookPUpdateRequest';
+import {BookPAddRequest} from '../types/BookPAddRequest'
 import { ConflictError } from '../types/errors/ConflictError';
+import * as fs from "fs";
+import { v4 as uuidv4 } from 'uuid'; // Import uuid to generate unique filenames
 
 async function readBinaryFile(filePath: string): Promise<Buffer | string> {
     try {
@@ -59,9 +62,11 @@ export class BookPModel {
     }
 
     async createBookP(req: Request, res: Response) {
-        let bookpRequest: BookPRequest;
+        
+        let bookpRequest: BookPAddRequest;
         try {
             bookpRequest = req.body;
+
         } catch (error) {
             res.status(StatusCodes.BAD_REQUEST).json({
                 error: ReasonPhrases.BAD_REQUEST,
@@ -80,8 +85,35 @@ export class BookPModel {
             return;
         }
 
+        // Decode base64-encoded image and audio content
+        const imageData = Buffer.from(bookpRequest.image, 'base64');
+        const audioData = Buffer.from(bookpRequest.audio, 'base64');
+
+        // Generate unique filenames based on timestamp and random string
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(7);
+        const imageFilename = `image_${timestamp}_${randomString}.png`;
+        const audioFilename = `audio_${timestamp}_${randomString}.mp3`;
+
+        const imagePath = 'resources/images/' + imageFilename
+        const audioPath = 'resources/audios/' + audioFilename
+
+        bookpRequest.image_path = imagePath;
+        bookpRequest.audio_path = audioPath;
+
         const newBookP = await prismaClient.bookPremium.create({
-            data: bookpRequest
+            data: {
+                title: bookpRequest.title,
+                synopsis: bookpRequest.synopsis,
+                genre: bookpRequest.genre,
+                release_date: bookpRequest.release_date,
+                word_count: bookpRequest.word_count,
+                duration: bookpRequest.duration,
+                graphic_cntn: bookpRequest.graphic_cntn,
+                image_path: bookpRequest.image_path,
+                audio_path: bookpRequest.audio_path,
+                author_id: bookpRequest.author_id,
+            }
         })
 
         if (!newBookP) {
@@ -90,6 +122,24 @@ export class BookPModel {
             });
             return;
         }
+
+        await fs.writeFileSync(
+            path.join(
+                __dirname,
+                "..",
+                "..",
+                imagePath
+            ), imageData
+        );
+
+        await fs.writeFileSync(
+            path.join(
+                __dirname,
+                "..",
+                "..",
+                audioPath
+            ), audioData
+        );
 
         res.status(StatusCodes.CREATED).json({
             data: {
@@ -170,7 +220,7 @@ export class BookPModel {
             throw new BadRequestError(author_id.error.message)
         }
 
-        const bookp = await prismaClient.bookPremium.findFirst({
+        const bookp = await prismaClient.bookPremium.findMany({
             where: { author_id: author_id.data },
             select: {
                 bookp_id: true,
@@ -194,17 +244,9 @@ export class BookPModel {
             return;
         }
 
-        // Read image and audio files
-        const imageData = bookp.image_path ? await getBase64FromFile(bookp.image_path) : "notExist";
-        const audioData = bookp.audio_path ? await getBase64FromFile(bookp.audio_path) : "notExist";
-
 
         res.status(StatusCodes.OK).json({
-            data: {
-                bookp,
-                imageBase64: imageData,
-                audioBase64: audioData,
-            }
+            data: bookp
         });
         console.log("Book Premium fetched");
         return;
@@ -220,6 +262,31 @@ export class BookPModel {
         }
 
         try {
+            const dummybook = await prismaClient.bookPremium.findFirst({
+                where: { bookp_id: id.data }
+            })
+
+            // Delete from storage
+            if (dummybook) {
+                fs.unlinkSync(
+                    path.join(
+                        __dirname,
+                        "..",
+                        "..",
+                        dummybook.image_path
+                    )
+                );
+    
+                fs.unlinkSync(
+                    path.join(
+                        __dirname,
+                        "..",
+                        "..",
+                        dummybook.audio_path
+                    )
+                );
+            }
+
             const bookp = await prismaClient.bookPremium.delete({
                 where: { bookp_id: id.data }                
             });
@@ -227,13 +294,16 @@ export class BookPModel {
             res.status(StatusCodes.OK).json({
                 data: bookp
             });
+
+            
+            console.log("Book deleted");
+
+
             return;
         } catch (error) {
             res.status(StatusCodes.NOT_FOUND).json({
                 error: "Book does not exist"
             });
-            console.log("Book deleted");
-            return;
         }
     }
 

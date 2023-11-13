@@ -8,15 +8,15 @@ def addBook():
     release_date = date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     
     data = {
-        "title": "Judul Buku 15",
-        "synopsis": "Ini judul buku 15",
+        "title": "Judul Buku 20",
+        "synopsis": "Ini judul buku 20",
         "genre": "Romance",
         "release_date": release_date,
         "word_count": 100,
         "duration": 40,
         "graphic_cntn": True,
-        "image_path": "../../resources/images/image1.png",
-        "audio_path": "../../resources/audios/audio1.mp3",
+        "image_path": "resources/images/image1.png",
+        "audio_path": "resources/audios/audio1.mp3",
         "author_id": 1,
     }
     
@@ -68,7 +68,7 @@ def deleteBook(bookp_id: int):
     return response
 
 if __name__ == "__main__":
-    response = editBook(2)
+    response = addBook()
     
     print("\nstatus code:", response.status_code)
     print("Response content:")
