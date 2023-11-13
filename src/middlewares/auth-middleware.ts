@@ -1,35 +1,70 @@
 import { NextFunction, Request, Response } from "express";
-import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken"
-import { jwtSecretKey } from "../config/jwt-config";
-import { AuthToken } from "../types/AuthToken";
+import { UnauthorizedError } from "../types/errors/UnauthorizedError";
 import { AuthRequest } from "../types/AuthRequest";
+import { AuthToken } from "../types/AuthToken";
+import { jwtSecretKey } from "../config/jwt-config";
+import { AuthTypes } from "../types/enums/AuthTypes";
 
 export class AuthMiddleware {
-    authenticate() {
-        return async (req: Request, res: Response, next: NextFunction) => {
-            const token = req
-                .header("Authorization")
-                ?.replace("Bearer ", "");
-            if (!token){
-                res.status(StatusCodes.UNAUTHORIZED).json({
-                    error: ReasonPhrases.UNAUTHORIZED,
-                });
-                return;
-            }
+    private checkSOAPKey(req: Request, res: Response, next: NextFunction, token: string) {
+        //TODO: Implement
+        return false;
+    }
 
-            try {
-                const decodedToken = jwt.verify(token, jwtSecretKey) as AuthToken;
-                (req as AuthRequest).authToken = decodedToken;
+    private checkMonolithKey(req: Request, res: Response, next: NextFunction, token: string) {
+        //TODO: Implement
+        return false;
+    }
 
-                next();
-            } catch (error) {
-                res.status(StatusCodes.UNAUTHORIZED).json({
-                    error: ReasonPhrases.UNAUTHORIZED,
-                });
-                return;
-            }
-
+    private checkUserJWT(req: Request, res: Response, next: NextFunction, token: string): boolean{
+        try {
+            const decodedToken = jwt.verify(token, jwtSecretKey) as AuthToken;
+            (req as AuthRequest).authToken = decodedToken;
+            return true;
+        } catch (error) {
+            return false;
         }
     }
+
+    authenticate(authType: AuthTypes) {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            const token = req
+            .header("Authorization")
+            ?.replace("Bearer ", "");
+            if (!token){
+                throw new UnauthorizedError("No token provided");
+            }
+            
+            console.log("Checking authorizations")
+            let success: boolean = false;
+
+            switch (authType) {
+                case AuthTypes.ANYAUTH:
+                    success = this.checkMonolithKey(req, res, next, token) || this.checkSOAPKey(req, res, next, token) || this.checkUserJWT(req, res, next, token);
+                    break;
+                case AuthTypes.INTERNALONLY:
+                    success = this.checkMonolithKey(req, res, next, token) || this.checkSOAPKey(req, res, next, token);
+                    break;
+                case AuthTypes.USERONLY:
+                    success = this.checkUserJWT(req, res, next, token);
+                    break;
+                case AuthTypes.MONOLITHONLY:
+                    success = this.checkMonolithKey(req, res, next, token);
+                    break;
+                case AuthTypes.SOAPONLY:
+                    success = this.checkSOAPKey(req, res, next, token);
+                    break;
+                default:
+                    throw new Error("Bad authentication checker");
+            }
+
+            if (success){
+                next();
+            }
+            else{
+                throw new UnauthorizedError("Bad token");
+            }
+        }
+    }    
 }

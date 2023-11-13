@@ -3,7 +3,7 @@ services:
   api:
     ports:
       - 8011:8011
-    env_file: .env
+    env_file: .env_docker
     volumes:
       - ./:/app
       - /app/node_modules
