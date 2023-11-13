@@ -76,8 +76,8 @@ def testSOAP():
     return response
 
 if __name__ == "__main__":
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOjEsImlhdCI6MTY5OTgwOTEzOCwiZXhwIjoxNjk5ODEyNzM4fQ.0B-R0H15QF3l3VH_ZsDNe552-aTctDuC9OPRbpGLT_Y"
-    response = register()
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOjEsImlhdCI6MTY5ODgzODk4NCwiZXhwIjoxNjk4ODQyNTg0fQ.y8OPGQ6GvfTTnzwlYOuQH7k0UxqnUCBIQE8ic1aayw4"
+    response = getAuthor(1)
     
     print("\nstatus code:", response.status_code)
     print("Response content:")

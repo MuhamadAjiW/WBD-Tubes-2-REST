@@ -78,6 +78,12 @@ export class AuthorController{
             })
         }
     }
+
+    getAuthorId () {
+        return async (req: Request, res: Response) => {
+            return await this.authorModel.decodeToken(req, res);
+        }
+    }
     
     testErrorMw () {
         return async (req: Request, res: Response) => {

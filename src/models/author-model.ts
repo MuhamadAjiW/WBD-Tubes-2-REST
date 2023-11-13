@@ -272,4 +272,23 @@ export class AuthorModel {
             data: token
         })
     }
+
+    async decodeToken(req: Request, res: Response) {
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+
+        if (!token) {
+            res.status(StatusCodes.UNAUTHORIZED).json({
+              error: 'No token provided',
+            });
+            return;
+        }
+
+        const decoded = jwt.verify(token, jwtSecretKey) as {author: {author_id: number}}
+
+        const author_id = decoded.author.author_id
+
+        res.status(StatusCodes.OK).json({
+            data: { author_id },
+        });
+    }
 }
