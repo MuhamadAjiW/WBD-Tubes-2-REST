@@ -1,7 +1,6 @@
 import { Request, Response, Router } from "express";
 import { AuthorController } from "../controllers/author-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
-import { ErrorMiddleware } from "../middlewares/error-middleware";
 import { SOAPController } from "../controllers/soap-controller";
 
 export class AuthorRoute{
@@ -17,7 +16,7 @@ export class AuthorRoute{
 
     getRoutes() {
         return Router()
-            .get("/token",
+            .post("/token",
                 this.authorController.getAuthorToken())
             .get('/token/check', 
                 this.authMiddleware.authenticate(),
@@ -42,7 +41,8 @@ export class AuthorRoute{
             .delete('/authors/:identifier', 
                 this.authorController.deleteOneAuthor())
             
-
-                
+            .get('/get/authorid',
+                this.authorController.getAuthorId())
+  
     }
 }

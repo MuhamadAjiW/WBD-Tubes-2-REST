@@ -344,10 +344,17 @@ export class AuthorModel {
     async getAuthorToken(req: Request, res: Response) {
         // _TODO: Uncomment kalo udah bug free
         // try {
+            console.log(req.body);
             const { email, password }: TokenRequest = req.body;
             if (!email || !password){
                 res.status(StatusCodes.BAD_REQUEST).json({
-                    error: ReasonPhrases.BAD_REQUEST,
+                    error: "No email provided",
+                });
+                return;
+            }
+            if (!password){
+                res.status(StatusCodes.BAD_REQUEST).json({
+                    error: "No password provided",
                 });
                 return;
             }
@@ -377,6 +384,8 @@ export class AuthorModel {
                 expiresIn: jwtExpireTime
             })
 
+            
+
             res.status(StatusCodes.OK).json({
                 data: token
             })
@@ -387,5 +396,24 @@ export class AuthorModel {
         //     });
         //     return;
         // }
+    }
+
+    async decodeToken(req: Request, res: Response) {
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+
+        if (!token) {
+            res.status(StatusCodes.UNAUTHORIZED).json({
+              error: 'No token provided',
+            });
+            return;
+        }
+
+        const decoded = jwt.verify(token, jwtSecretKey) as {author: {author_id: number}}
+
+        const author_id = decoded.author.author_id
+
+        res.status(StatusCodes.OK).json({
+            data: { author_id },
+        });
     }
 }

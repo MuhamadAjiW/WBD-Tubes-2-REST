@@ -19,7 +19,7 @@ def login():
     url = "http://localhost:8011/api/token"
 
     data = {
-        "email": "dummy@example.com",
+        "email": "dummy1@example.com",
         "password": "dummy_password",
     }
     headers = {'Content-Type': 'application/json'}
