@@ -8,6 +8,7 @@ import { redis } from './config/redis-config';
 import { BookPRoute } from './routes/bookp-route';
 import { badRequestErrorHandler, conflictErrorHandler, generalErrorHandler, notFoundErrorHandler, unauthorizedErrorHandler } from './middlewares/error-middleware';
 import "express-async-errors"
+import path from 'path';
 
 require("express-async-errors")
 
@@ -38,6 +39,9 @@ export class App{
         this.server.get('/', (req: Request, res: Response) => {
             res.send(`Server setup at ${serverPort}`);
         });
+
+        this.server.use('/static/images', express.static('resources/images'));
+        this.server.use('/static/audios', express.static('resources/audios'));
     }
         
     run () {
