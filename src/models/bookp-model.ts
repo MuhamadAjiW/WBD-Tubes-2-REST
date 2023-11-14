@@ -18,24 +18,6 @@ import { ConflictError } from '../types/errors/ConflictError';
 import * as fs from "fs";
 import { v4 as uuidv4 } from 'uuid'; // Import uuid to generate unique filenames
 
-async function readBinaryFile(filePath: string): Promise<Buffer | string> {
-    try {
-        const fileContents = await fsPromises.readFile(filePath)
-        return fileContents;
-    } catch (error) {
-        console.error(`Error reading file ${filePath}`, error)
-        return "Not Exist";
-    }
-}
-
-async function getBase64FromFile(filePath: string): Promise<string | null> {
-    const fileContents = await readBinaryFile(filePath);
-    if (fileContents) {
-      return fileContents.toString('base64');
-    }
-    return "Not Exist";
-  }
-
 export class BookPModel {
     async getBooksP(req: Request, res:Response) {
         const books = await prismaClient.bookPremium.findMany({
@@ -327,6 +309,7 @@ export class BookPModel {
         }
 
         const requestData: BookPUpdateRequest = bookPRequest.data
+        
 
         if (requestData.title && requestData.title != currentBook.title) {
             const existingBookTitle = await prismaClient.bookPremium.findFirst({
@@ -337,13 +320,103 @@ export class BookPModel {
             }
         }
 
+        // Generate unique filenames based on timestamp and random string
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(7);
+        const imageFilename = `image_${timestamp}_${randomString}.png`;
+        const audioFilename = `audio_${timestamp}_${randomString}.mp3`;
+
+        let newImagePath = 'resources/images/' + imageFilename
+        let newAudioPath = 'resources/audios/' + audioFilename
+        
+        if (requestData.image) {
+            requestData.image_path = newImagePath
+        }
+
+        if (requestData.audio) {
+            requestData.audio_path = newAudioPath 
+        }
+
+        const data: {
+            title?: string;
+            synopsis?: string;
+            genre?: string;
+            release_date: Date;
+            word_count?: number; 
+            duration?: number;
+            graphic_cntn?: boolean;
+            image_path?: string;
+            audio_path?: string;
+        } = {
+            title: requestData.title,
+            synopsis: requestData.synopsis,
+            genre: requestData.genre,
+            release_date: requestData.release_date,
+            word_count: requestData.word_count,
+            duration: requestData.duration,
+            graphic_cntn: requestData.graphic_cntn,
+        };
+
+        if (requestData.image_path !== "") {
+            data.image_path = requestData.image_path;
+        }
+
+        if (requestData.audio_path !== "") {
+            data.audio_path = requestData.audio_path;
+        }
+
         const newBookP = await prismaClient.bookPremium.update({
             where: { bookp_id: bookp_id.data },
-            data: requestData
+            data: data,
         })
 
         if (!newBookP) {
             throw new Error("Failed to update book");
+        }
+
+        if (requestData.image && requestData.image_path) {
+            const imageData = Buffer.from(requestData.image, 'base64');
+            fs.unlinkSync(
+                path.join(
+                    __dirname,
+                    "..",
+                    "..",
+                    currentBook.image_path
+                )
+            );
+
+            fs.writeFileSync(
+                path.join(
+                    __dirname,
+                    "..",
+                    "..",
+                    requestData.image_path
+                ),
+                imageData
+            )
+        }
+
+        if (requestData.audio && requestData.audio_path) {
+            const audioData = Buffer.from(requestData.audio, 'base64');
+
+            fs.unlinkSync(
+                path.join(
+                    __dirname,
+                    "..",
+                    "..",
+                    currentBook.audio_path
+                )
+            );
+
+            fs.writeFileSync(
+                path.join(
+                    __dirname,
+                    "..",
+                    "..",
+                    requestData.audio_path
+                ),
+                audioData
+            )
         }
 
         res.status(StatusCodes.CREATED).json({

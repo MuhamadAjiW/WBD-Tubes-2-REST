@@ -13,5 +13,7 @@ export const BookPUpdateRequest = z.object({
     graphic_cntn: z.boolean().optional(),
     image_path: z.string().optional(),
     audio_path: z.string().optional(),
+    audio: z.string().optional(),
+    image: z.string().optional(),
 });
 export type BookPUpdateRequest = z.infer<typeof BookPUpdateRequest>

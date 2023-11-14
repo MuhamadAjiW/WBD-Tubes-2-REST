@@ -52,11 +52,7 @@ def editAuthor(author_id: int):
     url = "http://localhost:8011/api/authors/" + str(author_id)
 
     data = {
-        "email": "dummy3@example.com",
-        "username": "dummy_user3",
-        "password": "dummy_password",
-        "name": "Dummy Fucker",
-        "bio": "This is a dummy bio"
+        "email": "dummy4@example.com",
     }
     headers = {'Content-Type': 'application/json'}
 

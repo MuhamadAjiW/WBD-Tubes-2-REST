@@ -8,8 +8,8 @@ def addBook():
     release_date = date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     
     data = {
-        "title": "Judul Buku 20",
-        "synopsis": "Ini judul buku 20",
+        "title": "Judul Buku 1",
+        "synopsis": "Ini judul buku 1",
         "genre": "Romance",
         "release_date": release_date,
         "word_count": 100,
@@ -39,8 +39,8 @@ def editBook(bookp_id):
         "word_count": 100,
         "duration": 40,
         "graphic_cntn": True,
-        "image_path": "../../resources/images/image1.png",
-        "audio_path": "../../resources/audios/audio1.mp3",
+        "image_path": "resources/images/image1.png",
+        "audio_path": "resources/audios/audio1.mp3",
         "author_id": 1,
     }
     
