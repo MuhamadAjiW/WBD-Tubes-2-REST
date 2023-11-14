@@ -6,9 +6,11 @@ import { AuthorRoute } from './routes/author-route';
 import { prismaClient } from './config/prisma-config';
 import { redis } from './config/redis-config';
 import { BookPRoute } from './routes/bookp-route';
+import { PlaylistRoute } from './routes/playlist-route';
 import { badRequestErrorHandler, conflictErrorHandler, generalErrorHandler, notFoundErrorHandler, unauthorizedErrorHandler } from './middlewares/error-middleware';
 import "express-async-errors"
 import path from 'path';
+import bodyParser from 'body-parser';
 
 require("express-async-errors")
 
@@ -18,11 +20,13 @@ export class App{
     constructor() {
         const authorRoute = new AuthorRoute();
         const bookPRoute = new BookPRoute();
+        const playlistRoute = new PlaylistRoute();
 
         prismaClient.$use(redis)
         
         console.log("Applying errormiddlewares");
         this.server = express();
+        this.server.use(bodyParser.json({ limit: '10mb' })); // Adjust the limit as needed
         this.server.use((cors as (options: cors.CorsOptions) => express.RequestHandler)({}));
         this.server.use(
         "/api",
@@ -30,6 +34,7 @@ export class App{
         express.urlencoded({ extended: true }),
         authorRoute.getRoutes(),
         bookPRoute.getRoutes(),
+        playlistRoute.getRoutes(),
         notFoundErrorHandler,
         conflictErrorHandler,
         badRequestErrorHandler,

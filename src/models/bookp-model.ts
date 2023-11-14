@@ -57,7 +57,10 @@ export class BookPModel {
         }
 
         const existingBookPTitle = await prismaClient.bookPremium.findFirst({
-            where: { title: bookpRequest.title }
+            where: {
+                title: bookpRequest.title,
+                author_id: bookpRequest.author_id,
+            }
         });
 
         if (existingBookPTitle) {
@@ -313,7 +316,8 @@ export class BookPModel {
 
         if (requestData.title && requestData.title != currentBook.title) {
             const existingBookTitle = await prismaClient.bookPremium.findFirst({
-                where: { title: requestData.title }
+                where: { title: requestData.title,
+                         author_id: currentBook.author_id }
             });
             if (existingBookTitle) {
                 throw new ConflictError("Title has already been used")
@@ -376,7 +380,7 @@ export class BookPModel {
 
         if (requestData.image && requestData.image_path) {
             const imageData = Buffer.from(requestData.image, 'base64');
-            fs.unlinkSync(
+            await fs.unlinkSync(
                 path.join(
                     __dirname,
                     "..",
@@ -385,7 +389,7 @@ export class BookPModel {
                 )
             );
 
-            fs.writeFileSync(
+            await fs.writeFileSync(
                 path.join(
                     __dirname,
                     "..",
@@ -399,7 +403,7 @@ export class BookPModel {
         if (requestData.audio && requestData.audio_path) {
             const audioData = Buffer.from(requestData.audio, 'base64');
 
-            fs.unlinkSync(
+            await fs.unlinkSync(
                 path.join(
                     __dirname,
                     "..",
@@ -408,7 +412,7 @@ export class BookPModel {
                 )
             );
 
-            fs.writeFileSync(
+            await fs.writeFileSync(
                 path.join(
                     __dirname,
                     "..",

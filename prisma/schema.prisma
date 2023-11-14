@@ -20,7 +20,7 @@ model Author {
   BookPremium BookPremium[]
   Playlist    Playlist[]
 }
-
+  
 model BookPremium {
   bookp_id     Int            @id @default(autoincrement())
   title        String         @unique
@@ -48,7 +48,7 @@ model Playlist {
 }
 
 model PlaylistBook {
-  playlist    Playlist    @relation(fields: [playlist_id], references: [playlist_id])
+  playlist    Playlist    @relation(fields: [playlist_id], references: [playlist_id], onDelete: Cascade)
   playlist_id Int
   bookp       BookPremium @relation(fields: [bookp_id], references: [bookp_id])
   bookp_id    Int
