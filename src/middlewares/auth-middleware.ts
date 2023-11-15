@@ -5,16 +5,15 @@ import { AuthRequest } from "../types/AuthRequest";
 import { AuthToken } from "../types/AuthToken";
 import { jwtSecretKey } from "../config/jwt-config";
 import { AuthTypes } from "../types/enums/AuthTypes";
+import { MOLI_TOKEN, SOAP_TOKEN } from "../config/server-config";
 
 export class AuthMiddleware {
     private checkSOAPKey(req: Request, res: Response, next: NextFunction, token: string) {
-        //TODO: Implement
-        return false;
+        return token === SOAP_TOKEN;
     }
 
     private checkMonolithKey(req: Request, res: Response, next: NextFunction, token: string) {
-        //TODO: Implement
-        return false;
+        return token === MOLI_TOKEN;
     }
 
     private checkUserJWT(req: Request, res: Response, next: NextFunction, token: string): boolean{

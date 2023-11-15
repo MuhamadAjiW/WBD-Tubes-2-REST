@@ -2,10 +2,16 @@ import axios from "axios";
 import { SOAPRequest } from "../types/SOAPRequest";
 import { Request, Response } from "express";
 import { Parser } from "xml2js";
+import { SERVER_TOKEN, SOAP_SERVICE, SOAP_TOKEN } from "../config/server-config";
 
 export class SOAPController{
-    private soapRoute: String = "http://tugas-besar-2-wbd-soap-api-1:8080";
-    private soapService: String = "http://services.wbdsoap"
+    private soapRoute: String;
+    private soapService: String;
+
+    constructor(soapRoute: string, soapService: string) {
+        this.soapRoute = soapRoute;
+        this.soapService = soapService;
+    }
     
     private getEnvelope(data: SOAPRequest): string{
         const head:string = `<?xml version="1.0" encoding="utf-8"?>
@@ -40,7 +46,7 @@ export class SOAPController{
                     headers: {
                         'Content-Type': "text/xml;charset=UTF-8",
                         "SOAPAction": `"${this.soapService}/${data.handler}/${data.method}"`,
-                        "Authorization": 'Bearer nyabun',
+                        "Authorization": `Bearer ${SERVER_TOKEN}`,
                     }
                 })
                 const parser = new Parser({ explicitArray: false });
@@ -64,24 +70,5 @@ export class SOAPController{
             }
         })
 
-    }
-
-
-    test () {
-        return async (req: Request, res: Response) => {
-            const testData: SOAPRequest = {
-                handler: 'SubscriptionService',
-                method: 'deleteSubscriptionsOne',
-                args: new Map([
-                    ['user_id', '1'],
-                    ['author_id', '1']
-                ])
-            }
-            console.log(this.getEnvelope(testData));
-            const response = await this.sendRequest("/api/subscribe", testData);
-            console.log("Response: ", response)
-
-
-        }
     }
 }

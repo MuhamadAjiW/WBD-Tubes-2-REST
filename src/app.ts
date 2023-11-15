@@ -1,7 +1,7 @@
 import { Express, Request, Response } from 'express';
 import express from 'express';
 import cors from 'cors';
-import { serverPort } from './config/server-config';
+import { SERVER_PORT } from './config/server-config';
 import { AuthorRoute } from './routes/author-route';
 import { prismaClient } from './config/prisma-config';
 import { redis } from './config/redis-config';
@@ -42,7 +42,7 @@ export class App{
         generalErrorHandler
         );
         this.server.get('/', (req: Request, res: Response) => {
-            res.send(`Server setup at ${serverPort}`);
+            res.send(`Server setup at ${SERVER_PORT}`);
         });
 
         this.server.use('/static/images', express.static('resources/images'));
@@ -55,8 +55,8 @@ export class App{
             console.log("\n\nServer continues running");
         })
 
-        this.server.listen(serverPort, () =>{
-            console.log(`Server setup at ${serverPort}`);
+        this.server.listen(SERVER_PORT, () =>{
+            console.log(`Server setup at ${SERVER_PORT}`);
         });
     }
 }

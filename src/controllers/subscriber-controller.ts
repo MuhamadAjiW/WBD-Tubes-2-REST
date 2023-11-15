@@ -6,14 +6,15 @@ import { BadRequestError } from "../types/errors/BadRequestError";
 import { SubscriptionUpdateRequest } from "../types/SubscriptionUpdateRequest";
 import { StatusCodes } from "http-status-codes";
 import { MonolithController } from "./monolith-controller";
+import { MOLI_URL, SOAP_SERVICE, SOAP_URL } from "../config/server-config";
 
 export class SubscriberController {
     soapController: SOAPController;
     monolithController: MonolithController;
 
     constructor() {
-        this.soapController = new SOAPController();
-        this.monolithController = new MonolithController();
+        this.soapController = new SOAPController(SOAP_URL, SOAP_SERVICE);
+        this.monolithController = new MonolithController(MOLI_URL);
     }
     
     index() {
