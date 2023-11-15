@@ -42,13 +42,12 @@ export class PlaylistModel {
         })
 
         if (!playlists) {
-            res.status(StatusCodes.NOT_FOUND).json({
-                error: "Author does not exist"
-            })
-            return;
+            throw new NotFoundError("Author does not exist");
         }
 
         res.status(StatusCodes.OK).json({
+            message: "Playlist fetch successful",
+            valid: true,
             data: playlists
         });
         console.log("Playlists fetched");
@@ -61,10 +60,7 @@ export class PlaylistModel {
         try {
             playlistRequest = req.body;
         } catch (error) {
-            res.status(StatusCodes.BAD_REQUEST).json({
-                error: ReasonPhrases.BAD_REQUEST,
-            });
-            return;
+            throw new BadRequestError("Bad request params");
         }
 
         const existingPlaylistTitle = await prismaClient.playlist.findFirst({
@@ -75,10 +71,7 @@ export class PlaylistModel {
         });
 
         if (existingPlaylistTitle) {
-            res.status(StatusCodes.CONFLICT).json({
-                error: "Title of the book already used once"
-            });
-            return;
+            throw new ConflictError("Title of the book already used once");
         }
 
         // Decode base64-encoded image and audio content
@@ -103,10 +96,7 @@ export class PlaylistModel {
         })
 
         if (!newPlaylist) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                error: ReasonPhrases.INTERNAL_SERVER_ERROR
-            });
-            return;
+            throw Error();
         }
 
         await fs.writeFileSync(
@@ -119,6 +109,8 @@ export class PlaylistModel {
         )
 
         res.status(StatusCodes.CREATED).json({
+            message: "Playlist creation successful",
+            valid: true,
             data: {
                 playlist_id: newPlaylist.playlist_id,
                 title: newPlaylist.title,
@@ -171,17 +163,11 @@ export class PlaylistModel {
           });
 
         if (!booksInPlaylist) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                error: ReasonPhrases.INTERNAL_SERVER_ERROR
-            });
-            return;
+            throw Error();
         }
         
         if (!playlistData) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                error: ReasonPhrases.INTERNAL_SERVER_ERROR
-            });
-            return;
+            throw Error();
         }
 
         // Get books from the same author but not in the playlist
@@ -199,10 +185,7 @@ export class PlaylistModel {
         })
 
         if (!recommendationBooks) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                error: ReasonPhrases.INTERNAL_SERVER_ERROR
-            });
-            return;
+            throw Error();
         }
 
         // Get author data
@@ -211,17 +194,18 @@ export class PlaylistModel {
         })
 
         if (!authorData) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                error: ReasonPhrases.INTERNAL_SERVER_ERROR
-            });
-            return;
+            throw Error();
         }
 
-        res.status(StatusCodes.CREATED).json({
-            playlistData: playlistData,
-            recommendationBooks: recommendationBooks,
-            booksInPlaylist: booksInPlaylist,
-            authorData: authorData,
+        res.status(StatusCodes.OK).json({
+            message: "Playlist books fetch successful",
+            valid: true,
+            data: {
+                playlistData: playlistData,
+                recommendationBooks: recommendationBooks,
+                booksInPlaylist: booksInPlaylist,
+                authorData: authorData,
+            }
         })
     }
 
@@ -256,6 +240,8 @@ export class PlaylistModel {
             })
 
             res.status(StatusCodes.OK).json({
+                message: "Playlist deletion successful",
+                valid: true,
                 data: playlist
             });
 
@@ -264,9 +250,7 @@ export class PlaylistModel {
 
             return;
         } catch (error) {
-            res.status(StatusCodes.NOT_FOUND).json({
-                error: "Playlist does not exist"
-            });
+            throw new NotFoundError("Playlist does not exist");
         }
     }
 
@@ -361,7 +345,9 @@ export class PlaylistModel {
             )
         }
 
-        res.status(StatusCodes.CREATED).json({
+        res.status(StatusCodes.OK).json({
+            message: "Playlist edition successful",
+            valid: true,
             data: {
                 playlist_id: newPlaylist.playlist_id,
                 title: newPlaylist.title,
@@ -386,10 +372,7 @@ export class PlaylistModel {
         try {
             playlistRequest = req.body;
         } catch (error) {
-            res.status(StatusCodes.BAD_REQUEST).json({
-                error: ReasonPhrases.BAD_REQUEST,
-            });
-            return;
+            throw new BadRequestError("Bad request params");
         }
 
         const newPlaylistBook = await prismaClient.playlistBook.create({
@@ -400,13 +383,12 @@ export class PlaylistModel {
         })
 
         if (!newPlaylistBook) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                error: ReasonPhrases.INTERNAL_SERVER_ERROR
-            });
-            return;
+            throw Error();
         }
 
         res.status(StatusCodes.CREATED).json({
+            message: "Playlist book addition successful",
+            valid: true,
             data: {
                 playlist_id: newPlaylistBook.playlist_id,
                 bookp_id: newPlaylistBook.bookp_id,
@@ -427,10 +409,7 @@ export class PlaylistModel {
         try {
             playlistRequest = req.body;
         } catch (error) {
-            res.status(StatusCodes.BAD_REQUEST).json({
-                error: ReasonPhrases.BAD_REQUEST,
-            });
-            return;
+            throw new BadRequestError("Bad request params");
         }
         try {
             const deletePlaylistBook = await prismaClient.playlistBook.delete({
@@ -443,15 +422,15 @@ export class PlaylistModel {
             })
     
             res.status(StatusCodes.OK).json({
+                message: "Playlist book deletion successful",
+                valid: true,
                 data: deletePlaylistBook
             })
     
             console.log("Book deleted from playlist")
             return;
         } catch (error) {
-            res.status(StatusCodes.NOT_FOUND).json({
-                error: "Playlist or book does not exist"
-            });
+            throw new Error("Playlist or book does not exist");
         }
     }
 }

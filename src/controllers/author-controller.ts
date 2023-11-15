@@ -71,8 +71,9 @@ export class AuthorController{
                 throw new UnauthorizedError("Bad token");
             }
             
-            res.status(StatusCodes.OK).json({
-                data: "Token is valid"
+            res.status(StatusCodes.OK).json({                
+                message: "Token is valid",
+                valid: true,
             })
         }
     }
@@ -85,6 +86,8 @@ export class AuthorController{
             }
             
             res.status(StatusCodes.OK).json({
+                message: "ID fetch successful",
+                valid: true,
                 data: authToken.author_id
             })
         }

@@ -66,14 +66,14 @@ def deleteAuthor(author_id: int):
     return response
 
 def testSOAP():
-    url = "http://localhost:8011/api/authors/11/subscribers/requests/1"
+    url = "http://localhost:8011/api/authors/1/subscribers/requests"
 
     data = {
         "method": "REJECT",
     }
     headers = {'Content-Type': 'application/json'}
 
-    response = requests.patch(url, headers=headers, json=data)
+    response = requests.get(url, headers=headers, json=data)
     return response
 
 if __name__ == "__main__":

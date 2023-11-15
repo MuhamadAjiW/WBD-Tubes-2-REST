@@ -16,37 +16,27 @@ import { NotFoundError } from '../types/errors/NotFoundError';
 
 export class AuthorModel {
     async getAuthors(req: Request, res: Response){
-        // _TODO: Uncomment kalo udah bug free
-        // try {
-            // const page = z.number().int();
-            // const limit = z.number().int();
+        // TODO: Paging?
+        // const page = z.number().int();
+        // const limit = z.number().int();
 
-            const user = await prismaClient.author.findMany({
-                select: {
-                    author_id: true,
-                    email: true,
-                    username: true,
-                    name: true,
-                    bio: true,
-                }
-            });
+        const user = await prismaClient.author.findMany({
+            select: {
+                author_id: true,
+                email: true,
+                username: true,
+                name: true,
+                bio: true,
+            }
+        });
 
-            res.status(StatusCodes.OK).json({
-                data: user
-            });
-            console.log("Authors fetched");
-            return;
-
-        // _TODO: Uncomment kalo udah bug free
-        // } catch (error) {
-        //     if(notId){
-        //         throw new Error();
-        //     }
-        //     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        //         error: ReasonPhrases.INTERNAL_SERVER_ERROR
-        //     });
-        //     return;
-        // }
+        res.status(StatusCodes.OK).json({
+            message: "Author fetch successful",
+            valid: true,
+            data: user
+        });
+        console.log("Authors fetched");
+        return;
     }
 
     async createAuthor(req: Request, res: Response) {
@@ -81,6 +71,8 @@ export class AuthorModel {
         }
     
         res.status(StatusCodes.CREATED).json({
+            message: "Author creation successful",
+            valid: true,
             data: {
                 author_id: newAuthor.author_id,
                 email: newAuthor.email,
@@ -122,6 +114,8 @@ export class AuthorModel {
         }
 
         res.status(StatusCodes.OK).json({
+            message: "Author fetch successful",
+            valid: true,
             data: user
         });
         console.log("Author fetched");
@@ -150,6 +144,8 @@ export class AuthorModel {
         }
 
         res.status(StatusCodes.OK).json({
+            message: "Author fetch successful",
+            valid: true,
             data: user
         });
         console.log("Author fetched");
@@ -170,6 +166,8 @@ export class AuthorModel {
             });
 
             res.status(StatusCodes.OK).json({
+                message: "Author deletion successful",
+                valid: true,
                 data: user
             });
             return;
@@ -226,7 +224,9 @@ export class AuthorModel {
             throw new Error("Failed to update author");
         }
     
-        res.status(StatusCodes.CREATED).json({
+        res.status(StatusCodes.OK).json({
+            message: "Author update successful",
+            valid: true,
             data: {
                 author_id: newAuthor.author_id,
                 email: newAuthor.email,
@@ -269,6 +269,8 @@ export class AuthorModel {
         })
 
         res.status(StatusCodes.OK).json({
+            message: "Token fetch successful",
+            valid: true,
             data: token
         })
     }
@@ -285,6 +287,8 @@ export class AuthorModel {
         const author_id = decoded.author.author_id
 
         res.status(StatusCodes.OK).json({
+            message: "Token decode successful",
+            valid: true,
             data: { author_id },
         });
     }

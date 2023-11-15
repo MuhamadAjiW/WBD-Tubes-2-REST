@@ -37,6 +37,8 @@ export class BookPModel {
         });
 
         res.status(StatusCodes.OK).json({
+            message: "Premium Books fetch successful",
+            valid: true,
             data: books
         });
         console.log("Premium Books fetched")
@@ -50,10 +52,7 @@ export class BookPModel {
             bookpRequest = req.body;
 
         } catch (error) {
-            res.status(StatusCodes.BAD_REQUEST).json({
-                error: ReasonPhrases.BAD_REQUEST,
-            });
-            return;
+            throw new BadRequestError("Bad request parameters");
         }
 
         const existingBookPTitle = await prismaClient.bookPremium.findFirst({
@@ -64,10 +63,7 @@ export class BookPModel {
         });
 
         if (existingBookPTitle) {
-            res.status(StatusCodes.CONFLICT).json({
-                error: "Title of the book already used once"
-            });
-            return;
+            throw new ConflictError("Title of the book already used once");
         }
 
         // Decode base64-encoded image and audio content
@@ -102,10 +98,7 @@ export class BookPModel {
         })
 
         if (!newBookP) {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-                error: ReasonPhrases.INTERNAL_SERVER_ERROR
-            });
-            return;
+            throw new Error();
         }
 
         await fs.writeFileSync(
@@ -127,6 +120,8 @@ export class BookPModel {
         );
 
         res.status(StatusCodes.CREATED).json({
+            message: "Book creation successful",
+            valid: true,
             data: {
                 bookp_id: newBookP.bookp_id,
                 title: newBookP.title,
@@ -151,9 +146,7 @@ export class BookPModel {
         console.log("Checking by ID");
         const id = req.params.identifier;
         if (!id) {
-            res.status(StatusCodes.BAD_REQUEST).json({
-                error: ReasonPhrases.BAD_REQUEST,
-            });
+            throw new BadRequestError("Id not provided");
             return;
         }
 
@@ -181,13 +174,12 @@ export class BookPModel {
         });
 
         if (!bookp) {
-            res.status(StatusCodes.NOT_FOUND).json({
-                error: "User does not exist"
-            });
-            return;
+            throw new NotFoundError("User does not exist");
         }
 
         res.status(StatusCodes.OK).json({
+            message: "Premium Books fetch successful",
+            valid: true,
             data: bookp
         });
         console.log("Book Premium fetched");
@@ -223,14 +215,13 @@ export class BookPModel {
         });
 
         if (!bookp) {
-            res.status(StatusCodes.NOT_FOUND).json({
-                error: "Author does not exist"
-            });
-            return;
+            throw new NotFoundError("Author does not exist");
         }
 
 
         res.status(StatusCodes.OK).json({
+            message: "Premium Books fetch successful",
+            valid: true,
             data: bookp
         });
         console.log("Book Premium fetched");
@@ -277,6 +268,8 @@ export class BookPModel {
             });
 
             res.status(StatusCodes.OK).json({
+                message: "Premium Books deletion successful",
+                valid: true,
                 data: bookp
             });
 
@@ -286,9 +279,7 @@ export class BookPModel {
 
             return;
         } catch (error) {
-            res.status(StatusCodes.NOT_FOUND).json({
-                error: "Book does not exist"
-            });
+            throw new NotFoundError("Book does not exist");
         }
     }
 
@@ -423,7 +414,9 @@ export class BookPModel {
             )
         }
 
-        res.status(StatusCodes.CREATED).json({
+        res.status(StatusCodes.OK).json({
+            message: "Book edition successful",
+            valid: true,
             data: {
                 bookp_id: newBookP.bookp_id,
                 title: newBookP.title,

@@ -60,6 +60,7 @@ export class SOAPController{
                         if (responseData && responseData.data && responseData.data.$) {
                             delete responseData.data.$;
                         }
+                        responseData.valid = responseData.valid === "true";
 
                         resolve(responseData);
                     }
