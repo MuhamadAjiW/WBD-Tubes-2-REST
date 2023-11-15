@@ -155,4 +155,34 @@ export class SubscriberController {
             return;
         }
     }
+
+    deletaAuthorSubscriber() {
+        return async (req: Request, res: Response) => {
+            const author_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
+
+            if (!author_id.success){
+                throw new BadRequestError(author_id.error.message);
+            }
+
+            const user_id = z.number().int().safeParse(parseInt(req.params.user_identifier, 10));
+            if(!user_id.success){
+                throw new BadRequestError(user_id.error.message);
+            }
+
+            const data: SOAPRequest = {
+                handler: "SubscriptionService",
+                method: "deleteSubscriptionsOne",
+                args: new Map([
+                    ['user_id', req.params.user_identifier],
+                    ['author_id', req.params.identifier]
+                ])
+            }
+
+            const response = await this.soapController.sendRequest("/api/subscribe", data);
+            res.status(StatusCodes.OK).json(response);
+            return;
+        }
+    }
+
+
 }
