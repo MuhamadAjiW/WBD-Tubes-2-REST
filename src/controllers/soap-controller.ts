@@ -47,12 +47,14 @@ export class SOAPController{
                 parser.parseString(response.data, (error, result) => {
                     if (error){
                         console.error("XML parsing error:", error);
-                        console.log(result);
                         reject(error);
                     } else{
-                        console.log("XML parsing success:");
-                        console.log(result);
                         const responseData = result['S:Envelope']['S:Body'][`ns2:${data.method}Response`]['return'];
+
+                        if (responseData && responseData.data && responseData.data.$) {
+                            delete responseData.data.$;
+                        }
+
                         resolve(responseData);
                     }
                 })

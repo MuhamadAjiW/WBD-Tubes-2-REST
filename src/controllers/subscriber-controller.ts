@@ -47,7 +47,7 @@ export class SubscriberController {
                 args: new Map([
                     ['user_id', req.params.user_identifier],
                     ['author_id', req.params.identifier],
-                    ['status', updateRequest.method],
+                    ['status', updateRequest.method]
                 ])
             }
 
@@ -101,6 +101,20 @@ export class SubscriberController {
             }
 
             const response = await this.soapController.sendRequest("/api/subscribe", data);
+            
+            if(Array.isArray(response['data'])){
+                for (const item of response['data']) {
+                    let userData = await this.monolithController.getRequest(`/api/user/get?uid=${item["user_id"]}`);
+                    item["userDetails"] = userData.data;
+                }
+            } else{
+                if(response["data"]){
+                    let userData = await this.monolithController.getRequest(`/api/user/get?uid=${response["data"]["user_id"]}`);
+                    response["data"]["user_details"] = userData.data;
+                    response["data"] = [response["data"]];
+                }
+            }
+
             res.status(StatusCodes.OK).json(response);
             return;
         }
@@ -129,8 +143,13 @@ export class SubscriberController {
                     let userData = await this.monolithController.getRequest(`/api/user/get?uid=${item["user_id"]}`);
                     item["userDetails"] = userData.data;
                 }
+            } else{
+                if(response["data"]){
+                    let userData = await this.monolithController.getRequest(`/api/user/get?uid=${response["data"]["user_id"]}`);
+                    response["data"]["user_details"] = userData.data;
+                    response["data"] = [response["data"]];
+                }
             }
-            
             
             res.status(StatusCodes.OK).json(response);
             return;
