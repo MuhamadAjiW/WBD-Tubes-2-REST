@@ -50,7 +50,7 @@ model Playlist {
 model PlaylistBook {
   playlist    Playlist    @relation(fields: [playlist_id], references: [playlist_id], onDelete: Cascade)
   playlist_id Int
-  bookp       BookPremium @relation(fields: [bookp_id], references: [bookp_id])
+  bookp       BookPremium @relation(fields: [bookp_id], references: [bookp_id], onDelete: Cascade)
   bookp_id    Int
 
   @@id([playlist_id, bookp_id])

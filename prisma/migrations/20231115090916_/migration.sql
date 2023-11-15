@@ -68,4 +68,4 @@ ALTER TABLE "Playlist" ADD CONSTRAINT "Playlist_author_id_fkey" FOREIGN KEY ("au
 ALTER TABLE "PlaylistBook" ADD CONSTRAINT "PlaylistBook_playlist_id_fkey" FOREIGN KEY ("playlist_id") REFERENCES "Playlist"("playlist_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PlaylistBook" ADD CONSTRAINT "PlaylistBook_bookp_id_fkey" FOREIGN KEY ("bookp_id") REFERENCES "BookPremium"("bookp_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PlaylistBook" ADD CONSTRAINT "PlaylistBook_bookp_id_fkey" FOREIGN KEY ("bookp_id") REFERENCES "BookPremium"("bookp_id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -186,14 +186,13 @@ export class PlaylistModel {
 
         // Get books from the same author but not in the playlist
         const author_id = playlistData.author_id;
+
         const recommendationBooks = await prismaClient.bookPremium.findMany({
             where: {
                 author_id: author_id,
-                NOT: {
-                    PlaylistBook: {
-                        some: {
-                            playlist_id: playlist_id.data,
-                        }
+                PlaylistBook: {
+                    none: {
+                        playlist_id: playlist_id.data,
                     }
                 }
             }
