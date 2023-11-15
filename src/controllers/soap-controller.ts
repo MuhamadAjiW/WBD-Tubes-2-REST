@@ -2,7 +2,6 @@ import axios from "axios";
 import { SOAPRequest } from "../types/SOAPRequest";
 import { Request, Response } from "express";
 import { Parser } from "xml2js";
-import { parse } from "path";
 
 export class SOAPController{
     private soapRoute: String = "http://tugas-besar-2-wbd-soap-api-1:8080";
@@ -40,17 +39,20 @@ export class SOAPController{
                 const response = await axios.post(this.soapRoute + endpoint, soapData, {
                     headers: {
                         'Content-Type': "text/xml;charset=UTF-8",
-                        "SOAPAction": `"${this.soapService}/${data.handler}/${data.method}"`
+                        "SOAPAction": `"${this.soapService}/${data.handler}/${data.method}"`,
+                        "Authorization": 'Bearer nyabun',
                     }
                 })
-                const parser = new Parser;
+                const parser = new Parser({ explicitArray: false });
                 parser.parseString(response.data, (error, result) => {
                     if (error){
                         console.error("XML parsing error:", error);
+                        console.log(result);
                         reject(error);
                     } else{
                         console.log("XML parsing success:");
-                        const responseData = result['S:Envelope']['S:Body'][0][`ns2:${data.method}Response`][0]['return'][0];
+                        console.log(result);
+                        const responseData = result['S:Envelope']['S:Body'][`ns2:${data.method}Response`]['return'];
                         resolve(responseData);
                     }
                 })
