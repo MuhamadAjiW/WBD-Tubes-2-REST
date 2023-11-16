@@ -55,6 +55,6 @@ export class AuthorRoute{
                 this.subscriberController.updateSubscriber())
             .delete("/authors/:identifier/subscribers/requests/:user_identifier",
                 this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
-                this.subscriberController.deletaAuthorSubscriber())
+                this.subscriberController.deleteAuthorSubscriber())
     }
 }

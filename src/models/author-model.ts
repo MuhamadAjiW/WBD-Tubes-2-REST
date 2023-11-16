@@ -13,6 +13,7 @@ import { BadRequestError } from '../types/errors/BadRequestError';
 import { UnauthorizedError } from '../types/errors/UnauthorizedError';
 import { ConflictError } from '../types/errors/ConflictError';
 import { NotFoundError } from '../types/errors/NotFoundError';
+import { AuthRequest } from '../types/AuthRequest';
 
 export class AuthorModel {
     async getAuthors(req: Request, res: Response){
@@ -157,6 +158,13 @@ export class AuthorModel {
             throw new BadRequestError(id.error.message);
         }
 
+        const { authToken } = req as AuthRequest;
+        if (authToken){
+            if (authToken.author_id != id.data){
+                throw new UnauthorizedError("Cannot delete other users");
+            }    
+        }
+
         try {
             const user = await prismaClient.author.delete({
                 where: { author_id: id.data }                
@@ -173,10 +181,17 @@ export class AuthorModel {
         }
     }
 
-    async editAuthor(req: Request, res: Response) {
+    async editAuthor(req: Request, res: Response) {        
         const author_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
         if(!author_id.success){
             throw new BadRequestError(author_id.error.message);
+        }
+
+        const { authToken } = req as AuthRequest;
+        if (authToken){
+            if (authToken.author_id != author_id.data){
+                throw new UnauthorizedError("Cannot update other users");
+            }    
         }
 
         const currentUser = await prismaClient.author.findFirst({

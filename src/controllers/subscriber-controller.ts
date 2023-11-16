@@ -7,6 +7,8 @@ import { SubscriptionUpdateRequest } from "../types/SubscriptionUpdateRequest";
 import { StatusCodes } from "http-status-codes";
 import { MonolithController } from "./monolith-controller";
 import { MOLI_URL, SOAP_SERVICE, SOAP_URL } from "../config/server-config";
+import { AuthRequest } from "../types/AuthRequest";
+import { UnauthorizedError } from "../types/errors/UnauthorizedError";
 
 export class SubscriberController {
     soapController: SOAPController;
@@ -22,6 +24,13 @@ export class SubscriberController {
             const author_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
             if (!author_id.success){
                 throw new BadRequestError(author_id.error.message);
+            }
+
+            const { authToken } = req as AuthRequest;
+            if (authToken){
+                if (authToken.author_id != author_id.data){
+                    throw new UnauthorizedError("Cannot update other author's subscribers");
+                }    
             }
 
             const user_id = z.number().int().safeParse(parseInt(req.params.user_identifier, 10));
@@ -151,12 +160,18 @@ export class SubscriberController {
         }
     }
 
-    deletaAuthorSubscriber() {
+    deleteAuthorSubscriber() {
         return async (req: Request, res: Response) => {
             const author_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
-
             if (!author_id.success){
                 throw new BadRequestError(author_id.error.message);
+            }
+
+            const { authToken } = req as AuthRequest;
+            if (authToken){
+                if (authToken.author_id != author_id.data){
+                    throw new UnauthorizedError("Cannot delete other author's subscribers");
+                }    
             }
 
             const user_id = z.number().int().safeParse(parseInt(req.params.user_identifier, 10));
