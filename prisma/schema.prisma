@@ -24,7 +24,7 @@ model Author {
 model BookPremium {
   bookp_id     Int            @id @default(autoincrement())
   title        String         @unique
-  synopsis     String         @unique
+  synopsis     String
   author       Author         @relation(fields: [author_id], references: [author_id])
   author_id    Int
   genre        String

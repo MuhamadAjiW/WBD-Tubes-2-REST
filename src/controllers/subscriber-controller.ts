@@ -42,7 +42,7 @@ export class SubscriberController {
                 args: new Map([
                     ['user_id', req.params.user_identifier],
                     ['author_id', req.params.identifier],
-                    ['status', updateRequest.method]
+                    ['status', updateRequest.status]
                 ])
             }
 

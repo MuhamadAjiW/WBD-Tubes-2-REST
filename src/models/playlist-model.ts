@@ -15,8 +15,6 @@ export class PlaylistModel {
     async getAuthorPlaylists(req: Request, res:Response) {
         let notId: boolean = false;
 
-        console.log("Checking by author ID");
-        console.log(req.params.identifier)
         const author_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
 
         if (!author_id.success) {
@@ -75,7 +73,7 @@ export class PlaylistModel {
         const randomString = Math.random().toString(36).substring(7);
         const imageFilename = `image_${timestamp}_${randomString}.png`;
 
-        const imagePath = 'resources/images/' + imageFilename
+        const imagePath = 'static/images/' + imageFilename
 
         playlistRequest.image_path = imagePath;
 
@@ -119,8 +117,6 @@ export class PlaylistModel {
     async getPlaylistBooks(req: Request, res: Response) {
         let notId: boolean = false;
 
-        console.log("Checking by author ID");
-        console.log(req.params.identifier)
         const playlist_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
 
         if (!playlist_id.success) {
@@ -205,7 +201,6 @@ export class PlaylistModel {
     async deletePlaylistByID(req: Request, res: Response) {
         let notId: boolean = false;
 
-        console.log("checking ID")
         const id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
         if (!id.success){
             throw new BadRequestError(id.error.message)
@@ -286,7 +281,7 @@ export class PlaylistModel {
         const randomString = Math.random().toString(36).substring(7);
         const imageFilename = `image_${timestamp}_${randomString}.png`;
 
-        let newImagePath = 'resources/images/' + imageFilename
+        let newImagePath = 'static/images/' + imageFilename
 
         if (requestData.image) {
             requestData.image_path = newImagePath

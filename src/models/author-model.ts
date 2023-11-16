@@ -87,7 +87,6 @@ export class AuthorModel {
 
     async getAuthorByID(req: Request, res: Response){
         let notId: boolean = false;
-        console.log("checking by ID");
         const id = req.params.identifier;
         if (!id){
             throw new BadRequestError("No id provided");
@@ -123,7 +122,6 @@ export class AuthorModel {
     }
 
     async getAuthorByUsername(req: Request, res: Response){
-        console.log("checking by Username");
         const username = z.string().safeParse(req.params.identifier);
         if (!username.success){
             throw new BadRequestError(username.error.message);
@@ -154,7 +152,6 @@ export class AuthorModel {
 
     async deleteAuthorByID(req: Request, res: Response){
         let notId: boolean = false;
-        console.log("checking by ID");
         const id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
         if (!id.success){
             throw new BadRequestError(id.error.message);

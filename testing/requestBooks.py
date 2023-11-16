@@ -15,8 +15,8 @@ def addBook():
         "word_count": 100,
         "duration": 40,
         "graphic_cntn": True,
-        "image_path": "resources/images/image1.png",
-        "audio_path": "resources/audios/audio1.mp3",
+        "image_path": "static/images/image1.png",
+        "audio_path": "static/audios/audio1.mp3",
         "author_id": 1,
     }
     
@@ -39,8 +39,8 @@ def editBook(bookp_id):
         "word_count": 100,
         "duration": 40,
         "graphic_cntn": True,
-        "image_path": "resources/images/image1.png",
-        "audio_path": "resources/audios/audio1.mp3",
+        "image_path": "static/images/image1.png",
+        "audio_path": "static/audios/audio1.mp3",
         "author_id": 1,
     }
     

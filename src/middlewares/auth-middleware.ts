@@ -35,7 +35,6 @@ export class AuthMiddleware {
                 throw new UnauthorizedError("No token provided");
             }
             
-            console.log("Checking authorizations")
             let success: boolean = false;
 
             switch (authType) {

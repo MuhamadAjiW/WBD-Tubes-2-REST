@@ -25,15 +25,12 @@ export class AuthorController{
 
     getOneAuthor () {
         return async (req: Request, res: Response) => {
-            console.log("Fetching one author");
             let retval;
             try {
                 retval = await this.authorModel.getAuthorByID(req, res);
             } catch (error) {
-                console.log("Requested url is not an ID");
                 retval = await this.authorModel.getAuthorByUsername(req, res);
             }
-            console.log("Done");
             return retval;
         }
     }

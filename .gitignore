@@ -2,5 +2,5 @@ dist/
 node_modules/
 .env
 .env_docker
-resources/
+static/
 redis/

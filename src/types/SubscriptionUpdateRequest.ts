@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const SubscriptionUpdateRequest = z.object({
-    method: z.string().refine((value) => value === "ACCEPT" || value === "REJECT", {
+    status: z.string().refine((value) => value === "ACCEPT" || value === "REJECT", {
         message: "Method must be either 'ACCEPT' or 'REJECT'",
     }),
 });

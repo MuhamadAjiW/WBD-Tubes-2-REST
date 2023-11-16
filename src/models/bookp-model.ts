@@ -68,8 +68,8 @@ export class BookPModel {
         const imageFilename = `image_${timestamp}_${randomString}.png`;
         const audioFilename = `audio_${timestamp}_${randomString}.mp3`;
 
-        const imagePath = 'resources/images/' + imageFilename
-        const audioPath = 'resources/audios/' + audioFilename
+        const imagePath = 'static/images/' + imageFilename
+        const audioPath = 'static/audios/' + audioFilename
 
         bookpRequest.image_path = imagePath;
         bookpRequest.audio_path = audioPath;
@@ -135,7 +135,6 @@ export class BookPModel {
     async getBookPByID(req: Request, res: Response) {
         let notId: boolean = false;
         
-        console.log("Checking by ID");
         const id = req.params.identifier;
         if (!id) {
             throw new BadRequestError("Id not provided");
@@ -181,8 +180,6 @@ export class BookPModel {
     async getBookPByAuthorID(req: Request, res: Response) {
         let notId: boolean = false;
 
-        console.log("Checking by author ID");
-        console.log(req.params.identifier)
         const author_id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
 
         if (!author_id.success){
@@ -223,7 +220,6 @@ export class BookPModel {
     async deleteBookPByID(req: Request, res: Response) {
         let notId: boolean = false;
 
-        console.log("checking ID")
         const id = z.number().int().safeParse(parseInt(req.params.identifier, 10));
         if (!id.success){
             throw new BadRequestError(id.error.message)
@@ -313,8 +309,8 @@ export class BookPModel {
         const imageFilename = `image_${timestamp}_${randomString}.png`;
         const audioFilename = `audio_${timestamp}_${randomString}.mp3`;
 
-        let newImagePath = 'resources/images/' + imageFilename
-        let newAudioPath = 'resources/audios/' + audioFilename
+        let newImagePath = 'static/images/' + imageFilename
+        let newAudioPath = 'static/audios/' + audioFilename
         
         if (requestData.image) {
             requestData.image_path = newImagePath

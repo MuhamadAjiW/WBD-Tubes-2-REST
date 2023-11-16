@@ -47,8 +47,8 @@ export class App{
             res.send(`Server setup at ${SERVER_PORT}`);
         });
 
-        this.server.use('/static/images', express.static('resources/images'));
-        this.server.use('/static/audios', express.static('resources/audios'));
+        this.server.use('/static/images', express.static('static/images'));
+        this.server.use('/static/audios', express.static('static/audios'));
     }
         
     run () {
