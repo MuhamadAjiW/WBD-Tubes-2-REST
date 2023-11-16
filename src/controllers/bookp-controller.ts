@@ -1,19 +1,11 @@
 import { Request, Response } from "express";
 import { BookPModel } from "../models/bookp-model";
-import { ReasonPhrases, StatusCodes } from "http-status-codes";
-import { AuthRequest } from "../types/AuthRequest";
 
 export class BookPController {
     bookpModel: BookPModel;
 
     constructor() {
         this.bookpModel = new BookPModel();
-    }
-    
-    index() {
-        return async (req: Request, res: Response) => {
-            res.send("Book Premium controller gateway");
-        }
     }
 
     createBookP() {

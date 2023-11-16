@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
 import { prismaClient } from '../config/prisma-config';
 import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';

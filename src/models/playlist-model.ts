@@ -1,22 +1,15 @@
 import { Request, Response } from 'express';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
 import { prismaClient } from '../config/prisma-config';
-import { hash, compare } from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { jwtExpireTime, jwtSecretKey } from '../config/jwt-config';
-import { TokenRequest } from '../types/TokenRequest';
 import { z } from 'zod';
-import { PlaylistRequest } from '../types/PlaylistRequest';
 import { PlaylistEntryRequest } from '../types/PlaylistEntryRequest';
-import { AuthToken } from '../types/AuthToken';
 import { BadRequestError } from '../types/errors/BadRequestError';
 import { PlaylistAddRequest } from '../types/PlaylistAddRequest';
 import * as fs from "fs";
-import path, { dirname } from 'path';
+import path from 'path';
 import { NotFoundError } from '../types/errors/NotFoundError';
 import { PlaylistEditRequest } from '../types/PlaylistEditRequest';
 import { ConflictError } from '../types/errors/ConflictError';
-import { title } from 'process';
 
 export class PlaylistModel {
     async getAuthorPlaylists(req: Request, res:Response) {

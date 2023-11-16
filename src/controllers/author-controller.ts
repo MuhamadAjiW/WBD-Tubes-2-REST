@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AuthorModel } from "../models/author-model";
-import { ReasonPhrases, StatusCodes } from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { AuthRequest } from "../types/AuthRequest";
 import { UnauthorizedError } from "../types/errors/UnauthorizedError";
 
@@ -9,13 +9,6 @@ export class AuthorController{
 
     constructor(){
         this.authorModel = new AuthorModel();
-    }
-
-    // _TODO: Remove this
-    index() {
-        return async (req: Request, res: Response) => {
-            res.send("Author controller gateway");
-        }
     }
 
     createAuthor() {
@@ -90,12 +83,6 @@ export class AuthorController{
                 valid: true,
                 data: authToken.author_id
             })
-        }
-    }
-    
-    testErrorMw () {
-        return async (req: Request, res: Response) => {
-            throw Error();
         }
     }
 }

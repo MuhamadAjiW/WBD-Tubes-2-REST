@@ -1,22 +1,14 @@
 import { Request, Response } from 'express';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
 import { prismaClient } from '../config/prisma-config';
-import { hash, compare } from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { jwtExpireTime, jwtSecretKey } from '../config/jwt-config';
-import { TokenRequest } from '../types/TokenRequest';
 import { z } from 'zod';
-import { BookPRequest } from '../types/BookPRequest';
-import { AuthToken } from '../types/AuthToken';
-import { promises as fsPromises } from 'fs';
-import path, { dirname } from 'path';
+import path from 'path';
 import { BadRequestError } from '../types/errors/BadRequestError';
 import { NotFoundError } from '../types/errors/NotFoundError';
 import { BookPUpdateRequest } from '../types/BookPUpdateRequest';
 import {BookPAddRequest} from '../types/BookPAddRequest'
 import { ConflictError } from '../types/errors/ConflictError';
 import * as fs from "fs";
-import { v4 as uuidv4 } from 'uuid'; // Import uuid to generate unique filenames
 
 export class BookPModel {
     async getBooksP(req: Request, res:Response) {

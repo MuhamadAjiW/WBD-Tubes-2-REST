@@ -9,8 +9,8 @@ import { BookPRoute } from './routes/bookp-route';
 import { PlaylistRoute } from './routes/playlist-route';
 import { badRequestErrorHandler, conflictErrorHandler, generalErrorHandler, notFoundErrorHandler, unauthorizedErrorHandler } from './middlewares/error-middleware';
 import "express-async-errors"
-import path from 'path';
 import bodyParser from 'body-parser';
+import { SubscribersRoute } from './routes/subs-route';
 
 require("express-async-errors")
 
@@ -21,6 +21,7 @@ export class App{
         const authorRoute = new AuthorRoute();
         const bookPRoute = new BookPRoute();
         const playlistRoute = new PlaylistRoute();
+        const subsRoute = new SubscribersRoute();
 
         prismaClient.$use(redis)
         
@@ -35,6 +36,7 @@ export class App{
         authorRoute.getRoutes(),
         bookPRoute.getRoutes(),
         playlistRoute.getRoutes(),
+        subsRoute.getRoutes(),
         notFoundErrorHandler,
         conflictErrorHandler,
         badRequestErrorHandler,

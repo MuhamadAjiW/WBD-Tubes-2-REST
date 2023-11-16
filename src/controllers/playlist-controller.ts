@@ -7,12 +7,6 @@ export class PlaylistController {
     constructor() {
         this.playlistModel = new PlaylistModel();
     }
-    
-    index() {
-        return async (req: Request, res: Response) => {
-            res.send("Playlist controller gateway");
-        }
-    }
 
     createPlaylist() {
         return async (req: Request, res: Response) => {

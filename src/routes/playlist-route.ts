@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import { PlaylistController } from "../controllers/playlist-controller";
 
 export class PlaylistRoute {
@@ -10,8 +10,6 @@ export class PlaylistRoute {
 
     getRoutes() {
         return Router()
-            .get('/playlists/author/:identifier',
-                this.playlistController.getPlaylists())
             .post('/playlists',
                 this.playlistController.createPlaylist())
             .delete('/playlists/:identifier',
@@ -24,5 +22,8 @@ export class PlaylistRoute {
                 this.playlistController.addPlaylistBook())
             .delete('/playlists/:identifier/books',
                 this.playlistController.deletePlaylistBook())
+
+            .get('/authors/:identifier/playlists',
+                this.playlistController.getPlaylists())
     }
 }

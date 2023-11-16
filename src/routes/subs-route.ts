@@ -1,46 +1,19 @@
 import { Router } from "express";
-import { AuthorController } from "../controllers/author-controller";
+import { SubscriberController } from "../controllers/subscriber-controller";
 import { AuthMiddleware } from "../middlewares/auth-middleware";
 import { AuthTypes } from "../types/enums/AuthTypes";
-import { SubscriberController } from "../controllers/subscriber-controller";
 
-export class AuthorRoute{
-    authorController: AuthorController;
+export class SubscribersRoute{
     subscriberController: SubscriberController;
     authMiddleware: AuthMiddleware;
 
     constructor() {
-        this.authorController = new AuthorController();
         this.subscriberController = new SubscriberController();
         this.authMiddleware = new AuthMiddleware();
     }
 
     getRoutes() {
         return Router()
-            .post("/token",
-                this.authorController.getAuthorToken())
-            .get('/token/check', 
-                this.authMiddleware.authenticate(AuthTypes.USERONLY),
-                this.authorController.checkToken())
-            .get('/token/id', 
-                this.authMiddleware.authenticate(AuthTypes.USERONLY),
-                this.authorController.getTokenID())
-
-            .get('/authors', 
-                this.authMiddleware.authenticate(AuthTypes.INTERNALONLY),
-                this.authorController.getAuthors())
-            .post("/authors",
-                this.authorController.createAuthor())
-            .get('/authors/:identifier', 
-                this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
-                this.authorController.getOneAuthor())
-            .patch('/authors/:identifier',
-                this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
-                this.authorController.updateOneAuthor())
-            .delete('/authors/:identifier', 
-                this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
-                this.authorController.deleteOneAuthor())
-
             .get('/authors/:identifier/subscribers', 
                 this.authMiddleware.authenticate(AuthTypes.ANYAUTH),
                 this.subscriberController.getSubscribersByAuthor())

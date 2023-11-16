@@ -1,8 +1,7 @@
 import axios from "axios";
 import { SOAPRequest } from "../types/SOAPRequest";
-import { Request, Response } from "express";
 import { Parser } from "xml2js";
-import { SERVER_TOKEN, SOAP_SERVICE, SOAP_TOKEN } from "../config/server-config";
+import { SERVER_TOKEN } from "../config/server-config";
 
 export class SOAPController{
     private soapRoute: String;

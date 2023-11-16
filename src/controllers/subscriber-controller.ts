@@ -16,12 +16,6 @@ export class SubscriberController {
         this.soapController = new SOAPController(SOAP_URL, SOAP_SERVICE);
         this.monolithController = new MonolithController(MOLI_URL);
     }
-    
-    index() {
-        return async (req: Request, res: Response) => {
-            res.send("Subscriber controller gateway");
-        }
-    }
 
     updateSubscriber() {
         return async (req: Request, res: Response) => {
