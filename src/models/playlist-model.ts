@@ -159,18 +159,20 @@ export class PlaylistModel {
             throw Error();
         }
 
-        // Get books from the same author but not in the playlist
         const author_id = playlistData.author_id;
 
+        let offsetLimit = await prismaClient.bookPremium.count();
+        offsetLimit = offsetLimit >= 5? offsetLimit - 5 : 0;
         const recommendationBooks = await prismaClient.bookPremium.findMany({
             where: {
-                author_id: author_id,
                 PlaylistBook: {
                     none: {
                         playlist_id: playlist_id.data,
                     }
                 }
-            }
+            },
+            skip: Math.floor(Math.random() * (offsetLimit)),
+            take: 5,
         })
 
         if (!recommendationBooks) {
