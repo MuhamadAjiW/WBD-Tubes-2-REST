@@ -14,6 +14,8 @@ export class BookPRoute {
                 this.bookPController.getBooks())
             .post('/books',
                 this.bookPController.createBookP())
+            .get('/books/:identifier',
+                this.bookPController.getBookPByID())
             .delete('/books/:identifier',
                 this.bookPController.deleteOneBookP())
             .patch('/books/:identifier',

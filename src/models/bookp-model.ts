@@ -138,7 +138,6 @@ export class BookPModel {
         const id = req.params.identifier;
         if (!id) {
             throw new BadRequestError("Id not provided");
-            return;
         }
 
         const numberId = parseInt(id, 10);

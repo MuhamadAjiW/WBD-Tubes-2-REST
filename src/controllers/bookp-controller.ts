@@ -19,7 +19,7 @@ export class BookPController {
             return await this.bookpModel.getBookPByAuthorID(req, res);
         }
     }
-
+    
     getBookPByID() {
         return async (req: Request, res: Response) => {
             return await this.bookpModel.getBookPByID(req, res);
