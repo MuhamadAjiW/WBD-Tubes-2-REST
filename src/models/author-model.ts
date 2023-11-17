@@ -14,8 +14,17 @@ import { UnauthorizedError } from '../types/errors/UnauthorizedError';
 import { ConflictError } from '../types/errors/ConflictError';
 import { NotFoundError } from '../types/errors/NotFoundError';
 import { AuthRequest } from '../types/AuthRequest';
+import { MonolithController } from '../controllers/monolith-controller';
+import { MOLI_URL } from '../config/server-config';
+import { STATUS_CODES } from 'http';
 
 export class AuthorModel {
+    monolithController: MonolithController;
+
+    constructor() {
+        this.monolithController = new MonolithController(MOLI_URL);
+    }
+    
     async getAuthors(req: Request, res: Response){
         // TODO: Paging?
         // const page = z.number().int();
@@ -61,6 +70,28 @@ export class AuthorModel {
         if (existingUserUname){
             throw new ConflictError("Username has already been taken");
         }
+        
+        let response;
+        let invalid: boolean = false;
+        try {
+            response = await this.monolithController.sendRequest("/api/users/premium", JSON.stringify(authRequest));
+        } catch (error) {
+            response = error;
+            invalid = true;
+        }
+        
+        if(invalid){
+            response = response.response.data;
+        } else{
+            response = response.data;
+        }
+        console.log("received data:", response);
+        if (!response.valid){
+            // TODO: fix error codes
+            res.status(StatusCodes.BAD_REQUEST).json(response);
+            return;
+        }
+
 
         authRequest.password = await hash(authRequest.password, 10);
         const newAuthor = await prismaClient.author.create({
