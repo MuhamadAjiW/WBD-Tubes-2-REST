@@ -18,7 +18,7 @@
 # Skema Basis Data
 
 Skema basis data yang digunakan adalah sebagai berikut
-(./doc/database_rest.drawio.png)
+![Database Rest](./doc/database_rest.png)
 
 # Fungsional Aplikasi
 
