@@ -61,14 +61,32 @@ export class AuthorModel {
             where: { email: authRequest.email }
         });
         if (existingUserEmail){
-            throw new ConflictError("Email has already been taken");
+            res.status(StatusCodes.CONFLICT).json({
+                message: "Invalid request",
+                valid: false,
+                data: {
+                    error: {
+                        emailError: "Email has already been taken"
+                    }   
+                }
+            });
+            return;
         }
 
         const existingUserUname = await prismaClient.author.findFirst({
             where: { username: authRequest.username }
         });
         if (existingUserUname){
-            throw new ConflictError("Username has already been taken");
+            res.status(StatusCodes.CONFLICT).json({
+                message: "Invalid request",
+                valid: false,
+                data: {
+                    error: {
+                        usernameError: "Username has already been taken"
+                    }   
+                }
+            });
+            return;
         }
         
         let response;
