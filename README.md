@@ -13,12 +13,12 @@
 
 ## Deskripsi Aplikasi _Web_
 
-**Baca.a** adalah sebuah aplikasi web yang sederhana pada saat ini aplikasi ini memungkinkan author untuk melakukan accept terhadap subscriber selain itu bisa juga untuk menambahkan buku. Baca.a juga memiliki fitur playlist premium yang dimanfaatkan agar author dapat mendapatkan keuntungan
+**Baca.a** adalah sebuah aplikasi web yang sederhana pada saat ini aplikasi ini memungkinkan author untuk melakukan accept terhadap subscriber selain itu bisa juga untuk menambahkan buku. Baca.a juga memiliki fitur playlist premium yang dimanfaatkan agar author dapat mendapatkan keuntungan. Bagian ini merupakan kode backend dari web.
 
 # Skema Basis Data
 
 Skema basis data yang digunakan adalah sebagai berikut
-(./doc/database_rest.png)
+(./doc/database_rest.drawio.png)
 
 # Fungsional Aplikasi
 
